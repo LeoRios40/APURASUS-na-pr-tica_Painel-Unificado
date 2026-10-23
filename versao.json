@@ -1,5 +1,5 @@
 {
-  "versao": 31,
+  "versao": 32,
   "data": "23/10/2026",
-  "resumo": "Analisador Produção: a produção de profissionais residentes passa a ser separada e não entra no APURASUS."
+  "resumo": "Analisador Produção: produção de Saúde Bucal (Proc. odontológicos) passa a ser contada, e o painel avisa quando alguma produção não entra em nenhuma regra."
 }

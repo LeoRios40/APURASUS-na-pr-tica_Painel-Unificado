@@ -1608,6 +1608,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Produção: Saúde Bucal</b> — profissionais com centro de custo de Saúde Bucal (ou Odonto) passam a ter a produção contada: <b>Procedimento</b> = coluna “Proc. odontológicos” do SIGSS. E, se algum profissional tiver produção que nenhuma regra aproveita, o painel agora avisa (“❓ Produção não contada”) em vez de deixar de fora sem aviso.</div></div>
           <div class="nv-item regra"><span class="nv-data">23/10/2026</span><div><b>Regra: residentes</b> — no Analisador Produção, o profissional cadastrado na Planilha de Vínculos com o centro de custo <b>RESIDENTE</b> tem a produção <b>separada</b>, como já acontece com a Gerência Geral: não entra na Sala de Procedimentos nem nos centros finais, e aparece no alerta “🎓 RESIDENTE” e no total separado.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Versão 30</b> — número da versão no topo; aviso quando existe versão mais nova (com internet); botão <b>Baixar para usar sem internet</b> quando o painel é aberto pelo link; botão <b>🐞 Reportar um problema</b> com versão, página, unidade e mês.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Estoque com vários meses</b> — escolha vários relatórios do SIGSS de uma vez: resumo por mês, detalhe de cada mês e planilha com uma aba por mês.</div></div>
@@ -4343,6 +4344,7 @@ const SIGSS = (function(){
         proc: sigssJson[sigssHeaderIdx].findIndex(c => c && removerAcentos(c.toString()).includes('PROCEDIMENTOS REALIZADOS')),
         acs: sigssJson[sigssHeaderIdx].findIndex(c => c && removerAcentos(c.toString()).includes('ATIVIDADES ACS')),
         vacina: sigssJson[sigssHeaderIdx].findIndex(c => c && removerAcentos(c.toString()) === 'VACINAS'),
+        odonto: sigssJson[sigssHeaderIdx].findIndex(c => c && removerAcentos(c.toString()).includes('ODONTOLOG')),
         total: sigssJson[sigssHeaderIdx].findIndex(c => c && removerAcentos(c.toString()) === 'VALOR TOTAL')
       };
 
@@ -4375,6 +4377,7 @@ const SIGSS = (function(){
         let pTriagem = parseFloat(row[colMap.triagem]) || 0;
         let pProc = parseFloat(row[colMap.proc]) || 0;
         let pAcs = parseFloat(row[colMap.acs]) || 0;
+        let pOdonto = colMap.odonto >= 0 ? (parseFloat(row[colMap.odonto]) || 0) : 0;
         let pTotal = parseFloat(row[colMap.total]) || 0;
 
         let cc = ccMap[nome];
@@ -4429,13 +4432,19 @@ const SIGSS = (function(){
           }
         }
 
+        const prontoAntes = totalProntoLancamento;
         let isAcs = ccLimpo.includes("AGENTE COMUNITARIO");
         if (!isAcs && pProc > 0){
           mapProcedimentos[cc] = (mapProcedimentos[cc] || 0) + pProc;
           totalProntoLancamento += pProc;
         }
 
-        if (ccLimpo.includes("MEDICO") || ccLimpo.includes("AMBULATORIO")){
+        if (ccLimpo.includes("SAUDE BUCAL") || ccLimpo.includes("ODONTO")){
+          /* Saúde Bucal / Odonto: Procedimento = coluna "Proc. odontológicos" */
+          addFinal(cc, "PROCEDIMENTO", pOdonto, `(Proc. odontológicos: ${pOdonto})`);
+          totalProntoLancamento += pOdonto;
+        }
+        else if (ccLimpo.includes("MEDICO") || ccLimpo.includes("AMBULATORIO")){
           addFinal(cc, "ATENDIMENTO", pAtend, `(Apenas Atendimentos: ${pAtend})`);
           totalProntoLancamento += pAtend;
         }
@@ -4452,6 +4461,16 @@ const SIGSS = (function(){
         else if (isAcs){
           addFinal(cc, "VISITA", pAcs, `(Atividades ACS: ${pAcs})`);
           totalProntoLancamento += pAcs;
+        }
+
+        /* rede de segurança: produção que nenhuma regra aproveitou não some calada */
+        const pVacProf = colMap.vacina >= 0 ? (parseFloat(row[colMap.vacina]) || 0) : 0; // vacinas entram pelo total da Sala de Vacinas
+        if (pTotal - pVacProf > 0 && totalProntoLancamento === prontoAntes){
+          totalIgnoradoAtencao += pTotal;
+          const msgText = `ATENÇÃO: A produção de ${nomeOriginal} (${cc}) não entrou em nenhum lançamento: o painel não tem regra para este centro de custo ou a produção está numa coluna que ele não usa. (Total não contado: ${pTotal}) -> AÇÃO RECOMENDADA: Confira o centro de custo na Planilha de Vínculos e fale com a DCFI.`;
+          alertasTexto.push(msgText);
+          alertasHTML += `<div class="alert warning"><span>❓</span><div><strong>PRODUÇÃO NÃO CONTADA:</strong> <b>${nomeOriginal}</b> (${cc}) tem produção no SIGSS, mas nenhuma regra do painel aproveitou. <br><b>(Total não contado: ${pTotal})</b><br><small><i>Ação: confira o centro de custo na Planilha de Vínculos e, se estiver certo, avise a DCFI.</i></small></div></div>`;
+          warningCount++;
         }
       }
 
@@ -6474,7 +6493,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 31, data: "23/10/2026" };
+const PAINEL_VERSAO = { n: 32, data: "23/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
