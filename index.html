@@ -1300,7 +1300,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <ul class="ol-ul">
           <li><b>Total de profissionais analisados (SIGSS):</b> quantos profissionais vieram no relatório do SIGSS.</li>
           <li><b>Total de produção PRONTA para lançamento:</b> a soma do que você vai digitar no APURASUS.</li>
-          <li><b>Total IGNORADO:</b> produção deixada de fora de propósito, por erro de cadastro (profissional fora da Planilha de Vínculos) ou por regra do APURASUS (ex.: NASF/eMulti em unidade que não é polo). Confira os alertas acima.</li>
+          <li><b>Total IGNORADO:</b> produção deixada de fora de propósito, por erro de cadastro (profissional fora da Planilha de Vínculos) ou por regra do APURASUS (ex.: NASF/eMulti em unidade que não é polo, ou <b>profissional residente</b>). Confira os alertas acima.</li>
         </ul>
         <h3 style="margin:16px 0 6px">As duas partes do relatório</h3>
         <ul class="ol-ul">
@@ -1608,6 +1608,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item regra"><span class="nv-data">23/10/2026</span><div><b>Regra: residentes</b> — no Analisador Produção, o profissional cadastrado na Planilha de Vínculos com o centro de custo <b>RESIDENTE</b> tem a produção <b>separada</b>, como já acontece com a Gerência Geral: não entra na Sala de Procedimentos nem nos centros finais, e aparece no alerta “🎓 RESIDENTE” e no total separado.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Versão 30</b> — número da versão no topo; aviso quando existe versão mais nova (com internet); botão <b>Baixar para usar sem internet</b> quando o painel é aberto pelo link; botão <b>🐞 Reportar um problema</b> com versão, página, unidade e mês.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Estoque com vários meses</b> — escolha vários relatórios do SIGSS de uma vez: resumo por mês, detalhe de cada mês e planilha com uma aba por mês.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Relatório PNGC: situação de cada unidade</b> — tabela única (visão DCFI) com Pendente, Atenção ou Em dia e o que olhar em cada unidade, com download em planilha.</div></div>
@@ -4266,6 +4267,7 @@ const SIGSS = (function(){
 
       let totalIgnoradoErro = 0;
       let totalIgnoradoAtencao = 0;
+      let totalIgnoradoResidente = 0;
       let totalProfissionaisLidos = 0;
       let totalProntoLancamento = 0;
 
@@ -4399,6 +4401,19 @@ const SIGSS = (function(){
           continue;
         }
 
+        /* Residentes: a produção não entra no APURASUS. Separa do total (mesma lógica da Gerência Geral),
+           sem contar na Sala de Procedimentos nem nos centros finais. */
+        if (ccLimpo.includes("RESIDENT")){
+          if (pTotal > 0){
+            totalIgnoradoResidente += pTotal;
+            const msgText = `RESIDENTE: Produção de ${nomeOriginal} foi SEPARADA e não entra no APURASUS. (Total separado: ${pTotal}) -> AÇÃO RECOMENDADA: Não lance esta produção (nem na Sala de Procedimentos, nem nos centros finais).`;
+            alertasTexto.push(msgText);
+            alertasHTML += `<div class="alert warning"><span>🎓</span><div><strong>RESIDENTE:</strong> A produção de <b>${nomeOriginal}</b> foi separada: profissional residente não entra no APURASUS. <br><b>(Total separado: ${pTotal})</b><br><small><i>Ação: não lance esta produção (nem na Sala de Procedimentos, nem nos centros finais).</i></small></div></div>`;
+            warningCount++;
+          }
+          continue;
+        }
+
         let isNasfEmulti = ccLimpo.includes("NASF") || ccLimpo.includes("EMULTI");
         if (isNasfEmulti){
           if (!isPolo){
@@ -4441,12 +4456,13 @@ const SIGSS = (function(){
       }
 
       let resumoHTML = "";
-      if (totalIgnoradoErro > 0 || totalIgnoradoAtencao > 0){
+      if (totalIgnoradoErro > 0 || totalIgnoradoAtencao > 0 || totalIgnoradoResidente > 0){
         resumoHTML = `
           <div class="resumo-box">
             <h4>📋 Resumo de Valores Ignorados:</h4>
             ${totalIgnoradoErro > 0 ? `<div class="resumo-item" style="color: #8C2E2B;">🔴 TOTAL IGNORADO POR ERROS: ${totalIgnoradoErro}</div>` : ''}
             ${totalIgnoradoAtencao > 0 ? `<div class="resumo-item" style="color: #7A5709;">🟡 TOTAL IGNORADO POR ATENÇÃO: ${totalIgnoradoAtencao}</div>` : ''}
+            ${totalIgnoradoResidente > 0 ? `<div class="resumo-item" style="color: #5B3E8A;">🎓 TOTAL SEPARADO (RESIDENTES): ${totalIgnoradoResidente}</div>` : ''}
           </div>
         `;
       }
@@ -4477,7 +4493,8 @@ const SIGSS = (function(){
       ws_data.push(["📊 RESUMO DA ANÁLISE", ""]);
       ws_data.push(["Total de Profissionais Analisados (SIGSS):", totalProfissionaisLidos]);
       ws_data.push(["Total de Produção PRONTA para Lançamento:", totalProntoLancamento]);
-      ws_data.push(["Total IGNORADO (Erros ou Regras APURASUS):", (totalIgnoradoErro + totalIgnoradoAtencao)]);
+      ws_data.push(["Total IGNORADO (Erros ou Regras APURASUS):", (totalIgnoradoErro + totalIgnoradoAtencao + totalIgnoradoResidente)]);
+      if (totalIgnoradoResidente > 0) ws_data.push(["   dos quais, produção de RESIDENTES (não entra no APURASUS):", totalIgnoradoResidente]);
       addEmpty();
 
       ws_data.push(["=== PASSO 1: LANÇAMENTOS DA SALA DE PROCEDIMENTOS ==="]);
@@ -4517,11 +4534,12 @@ const SIGSS = (function(){
         ws_data.push([alerta]);
       }
 
-      if (totalIgnoradoErro > 0 || totalIgnoradoAtencao > 0){
+      if (totalIgnoradoErro > 0 || totalIgnoradoAtencao > 0 || totalIgnoradoResidente > 0){
         ws_data.push([]);
         ws_data.push(["=== RESUMO DE VALORES IGNORADOS ==="]);
         if (totalIgnoradoErro > 0) ws_data.push([`TOTAL IGNORADO POR ERROS:`, totalIgnoradoErro]);
         if (totalIgnoradoAtencao > 0) ws_data.push([`TOTAL IGNORADO POR ATENÇÃO:`, totalIgnoradoAtencao]);
+        if (totalIgnoradoResidente > 0) ws_data.push([`TOTAL SEPARADO (RESIDENTES):`, totalIgnoradoResidente]);
       }
 
       const agoraSigss = new Date();
@@ -4531,7 +4549,7 @@ const SIGSS = (function(){
 
       finalWorkbookData = ws_data;
       ultimoAlertasTexto = alertasTexto;
-      ultimoResumoInfo = { unidade: unitName, isPolo, totalProfissionaisLidos, totalProntoLancamento, totalIgnoradoErro, totalIgnoradoAtencao };
+      ultimoResumoInfo = { unidade: unitName, isPolo, totalProfissionaisLidos, totalProntoLancamento, totalIgnoradoErro, totalIgnoradoAtencao, totalIgnoradoResidente };
 
       restaurarBotao();
 
@@ -6456,7 +6474,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 30, data: "23/10/2026" };
+const PAINEL_VERSAO = { n: 31, data: "23/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
