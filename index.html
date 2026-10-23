@@ -716,6 +716,9 @@ body.nav-pinned .app-main{margin-left:300px;width:calc(100% - 300px)}
 .gs-none{padding:12px;color:var(--muted)}
 .gs-flash{outline:4px solid var(--amber);outline-offset:4px;border-radius:6px;transition:outline-color .4s}
 /* =============== V30: versão, aviso de versão nova, reportar problema =============== */
+.crh-escopo{display:grid;gap:6px;background:var(--path-bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:4px 0 14px}
+.crh-escopo select{font:inherit;padding:8px 10px;border:2px solid var(--ink);border-radius:8px;background:var(--card);color:var(--ink);max-width:100%}
+.crh-escopo small{color:var(--muted);font-size:.85rem}
 .ver-selo{display:inline-flex;align-items:center;gap:6px;background:#ffffff14;border:1.5px solid #ffffff55;color:#fff;border-radius:8px;padding:8px 12px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit}
 .ver-selo:hover,.font-btn:hover{background:#ffffff26}
 .font-btn.hd-acao{font-weight:700;font-size:.9rem}
@@ -1608,6 +1611,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Conferência RH de um mês só</b> — nova escolha “Quais meses conferir?”. Por padrão a conferência olha só os meses das planilhas do SIGA enviadas: dá para mandar o relatório do APURASUS do semestre e só a planilha de março, por exemplo. A opção “Todos os meses do relatório” continua igual à de antes.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Produção: Saúde Bucal</b> — profissionais com centro de custo de Saúde Bucal (ou Odonto) passam a ter a produção contada: <b>Procedimento</b> = coluna “Proc. odontológicos” do SIGSS. E, se algum profissional tiver produção que nenhuma regra aproveita, o painel agora avisa (“❓ Produção não contada”) em vez de deixar de fora sem aviso.</div></div>
           <div class="nv-item regra"><span class="nv-data">23/10/2026</span><div><b>Regra: residentes</b> — no Analisador Produção, o profissional cadastrado na Planilha de Vínculos com o centro de custo <b>RESIDENTE</b> tem a produção <b>separada</b>, como já acontece com a Gerência Geral: não entra na Sala de Procedimentos nem nos centros finais, e aparece no alerta “🎓 RESIDENTE” e no total separado.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Versão 30</b> — número da versão no topo; aviso quando existe versão mais nova (com internet); botão <b>Baixar para usar sem internet</b> quando o painel é aberto pelo link; botão <b>🐞 Reportar um problema</b> com versão, página, unidade e mês.</div></div>
@@ -1729,6 +1733,15 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
             </div>
             <div class="crh-chips" id="crh-chips"></div>
           </div>
+        </div>
+
+        <div class="crh-escopo">
+          <label for="crh-escopo">📅 <b>Quais meses conferir?</b></label>
+          <select id="crh-escopo">
+            <option value="siga" selected>Só os meses das planilhas do SIGA que eu enviar (ex.: só março)</option>
+            <option value="todos">Todos os meses do relatório do APURASUS</option>
+          </select>
+          <small>Para conferir <b>um mês só</b>, envie o relatório do APURASUS (pode ser do semestre inteiro) e só a planilha do SIGA daquele mês. Na segunda opção, os meses sem planilha do SIGA aparecem em cinza (“Sem planilha do SIGA”).</small>
         </div>
 
         <details class="cf-adv crh-aliq" open>
@@ -5844,7 +5857,8 @@ const CRH = (function(){
     catch(e){ console.error(e); status("Erro: " + e.message, "err"); }
     finally { btn.disabled = false; btn.innerHTML = txt; }
   }
-  async function rodar(fa, fs){
+  async function rodar(fa, fs, opts){
+    const escopo = (opts && opts.escopo) || ($("crh-escopo") ? $("crh-escopo").value : "siga");
     status("Lendo os arquivos…", "");
     {
       const ap = await lerApura(fa);
@@ -5857,7 +5871,13 @@ const CRH = (function(){
         if (siga[m]){ avisos.push(`Há duas planilhas do SIGA para ${m} (“${siga[m].nome}” e “${s.nome}”). Usei só a primeira.`); chips.push([m+" repetido","dup"]); continue; }
         siga[m] = s; chips.push([m,"ok"]);
       }
-      ap.meses.filter(m => !siga[m]).forEach(m => chips.push([m+" sem SIGA","miss"]));
+      if (escopo === "siga"){
+        const so = ap.meses.filter(m => siga[m]), semSiga = ap.meses.filter(m => !siga[m]);
+        if (!so.length) throw new Error(`nenhuma planilha do SIGA é de um mês que está no relatório do APURASUS. Relatório: ${ap.meses.join(", ")}. Planilhas do SIGA: ${Object.keys(siga).join(", ") || "nenhuma"}.`);
+        if (semSiga.length) avisos.push(`Conferi só ${so.join(", ")} (o${so.length>1?"s meses":" mês"} das planilhas do SIGA enviadas). Os outros meses do relatório (${semSiga.join(", ")}) ficaram de fora. Para conferir todos, envie também as planilhas do SIGA deles ou escolha “Todos os meses do relatório”.`);
+        ap.meses = so;
+        ap.periodo = so.length === 1 ? so[0] : so[0] + " a " + so[so.length-1];
+      } else ap.meses.filter(m => !siga[m]).forEach(m => chips.push([m+" sem SIGA","miss"]));
       $("crh-chips").innerHTML = chips.map(([t,c]) => `<span class="crh-chip ${c}">${c==="ok"?"✓ ":""}${esc(t)}</span>`).join("");
       const fora = Object.keys(siga).filter(m => !ap.meses.includes(m));
       if (fora.length) avisos.push(`Planilha(s) do SIGA de ${fora.join(", ")} fora do período do relatório (não usadas).`);
@@ -6493,7 +6513,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 32, data: "23/10/2026" };
+const PAINEL_VERSAO = { n: 33, data: "23/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
