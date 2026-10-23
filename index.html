@@ -716,6 +716,13 @@ body.nav-pinned .app-main{margin-left:300px;width:calc(100% - 300px)}
 .gs-none{padding:12px;color:var(--muted)}
 .gs-flash{outline:4px solid var(--amber);outline-offset:4px;border-radius:6px;transition:outline-color .4s}
 /* =============== V30: versão, aviso de versão nova, reportar problema =============== */
+.cm-fixes{display:flex;flex-wrap:wrap;gap:6px;margin:5px 0 2px}
+.cm-fix{font:inherit;font-size:.8rem;font-weight:700;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;cursor:pointer}
+.cm-fix:hover,.cm-fix:focus{background:var(--amber);outline:none}
+.quem-t td.n{text-align:right;font-variant-numeric:tabular-nums}
+.quem-t tr.q-erro td{background:#fde2e1}.quem-t tr.q-aten td{background:#fff3cd}.quem-t tr.q-fora td{background:#ede9fe}
+:root.dark .quem-t tr.q-erro td{background:#3a1715}:root.dark .quem-t tr.q-aten td{background:#3a2f10}:root.dark .quem-t tr.q-fora td{background:#2a2140}
+details.quem summary{font-weight:800;cursor:pointer}
 .crh-escopo{display:grid;gap:6px;background:var(--path-bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:4px 0 14px}
 .crh-escopo select{font:inherit;padding:8px 10px;border:2px solid var(--ink);border-radius:8px;background:var(--card);color:var(--ink);max-width:100%}
 .crh-escopo small{color:var(--muted);font-size:.85rem}
@@ -1287,6 +1294,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
           <div class="status-box" id="sigss-status-info"></div>
           <h3 style="font-size:16px;margin-bottom:12px;">Validações e Alertas do Mês</h3>
           <div class="alerts-scroll" id="sigss-alerts-container"></div>
+          <div id="sigss-quem"></div>
           <div class="btn-row">
             <button class="btn btn-download" onclick="SIGSS.downloadExcel()">📥 Baixar Relatório Didático APURASUS</button>
           </div>
@@ -1563,6 +1571,15 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
           </div>
         </div>
 
+        <div class="crh-escopo">
+          <label for="cm-escopo">📅 <b>Quais meses conferir no RH e nos insumos?</b></label>
+          <select id="cm-escopo">
+            <option value="enviados" selected>Só os meses das planilhas do SIGA e dos relatórios do SIGSS que eu enviar</option>
+            <option value="todos">Todos os meses do relatório do APURASUS</option>
+          </select>
+          <small>A conferência do Drive sempre olha todos os meses do relatório, porque a planilha do Drive já traz o ano inteiro.</small>
+        </div>
+
         <div class="btn-row">
           <button class="btn btn-primary" id="cm-run-btn" onclick="CMES.rodar()">⚙️ Conferir tudo</button>
           <button class="btn btn-secondary" onclick="CMES.limpar()">🧹 Limpar Tudo (Alt+L)</button>
@@ -1588,6 +1605,27 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <p class="sub">Provisão = provisão% × base do SIGA · Encargo = encargo% × (base + provisão). Valem só para Remuneração CLT, Estatutário e Estatutário – Municipal. <button class="ol-lnk" data-guide="aliquota">Ver onde conferir no APURASUS</button></p>
         <div class="ol-tw" id="rg-aliq"></div>
       </div>
+      <div class="card" id="rg-producao">
+        <h3>📊 Regras do Analisador Produção (relatório do SIGSS)</h3>
+        <p class="sub">A regra de cada profissional vem do <b>centro de custo</b> dele na <b>Planilha de Vínculos</b> que a unidade preenche. O painel procura as palavras abaixo no nome do centro de custo, nesta ordem. Na tela do Analisador, o quadro <b>“Quem entrou em qual regra”</b> mostra o que aconteceu com cada profissional. <button class="ol-lnk" data-go="analise-sigss">Abrir o Analisador Produção</button></p>
+        <div class="ol-tw"><table class="ol-t">
+          <thead><tr><th>Centro de custo com…</th><th>O que acontece</th><th>Item de produção</th><th>Colunas do SIGSS usadas</th></tr></thead>
+          <tbody>
+            <tr><td><i>(profissional fora da Planilha de Vínculos)</i></td><td>🚨 Ignorado, com erro: cadastre o profissional</td><td>—</td><td>—</td></tr>
+            <tr><td><b>Gerência Geral</b></td><td>⛔ Não entra. Se tiver produção, aparece como erro</td><td>—</td><td>—</td></tr>
+            <tr><td><b>Residente</b></td><td>🎓 Separado: não entra no APURASUS</td><td>—</td><td>—</td></tr>
+            <tr><td><b>eMulti / NASF</b></td><td>Só entra se a unidade for <b>polo</b> (aba “Unidades polo” da Planilha de Vínculos). Fora do polo: ignorado</td><td>Atendimento</td><td>Atendimentos</td></tr>
+            <tr><td><b>Saúde Bucal / Odonto</b></td><td>Produção final</td><td>Procedimento</td><td>Proc. odontológicos</td></tr>
+            <tr><td><b>Médico</b> ou <b>Ambulatório</b></td><td>Produção final</td><td>Atendimento</td><td>Atendimentos</td></tr>
+            <tr><td><b>Enfermeiro</b></td><td>Produção final</td><td>Atendimento</td><td>Atendimentos + Agendamento triagem</td></tr>
+            <tr><td><b>Técnico</b> de enfermagem</td><td>Produção final</td><td>Procedimento</td><td>Agendamento triagem + Procedimentos realizados</td></tr>
+            <tr><td><b>Agente Comunitário</b> (ACS)</td><td>Produção final</td><td>Visita</td><td>Atividades ACS</td></tr>
+            <tr><td><i>todos, menos ACS</i></td><td>Os <b>procedimentos realizados</b> também entram no Mapa de Relacionamento da <b>Sala de Procedimentos</b> (Passo 1)</td><td>Procedimentos</td><td>Procedimentos realizados</td></tr>
+            <tr><td><b>Sala de Vacinas</b></td><td>Total da unidade (linha TOTAL do relatório)</td><td>Vacina aplicada</td><td>Vacinas</td></tr>
+            <tr><td><i>qualquer outro</i></td><td>❓ Se tiver produção, aparece “Produção não contada”: confira o centro de custo e avise a DCFI</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table></div>
+      </div>
       <div class="card">
         <h3>📋 Itens de custo: fonte do valor e onde lançar</h3>
         <input id="rg-q" class="rg-busca" type="search" placeholder="Filtrar item (ex.: limpeza, médicos, energia)…" aria-label="Filtrar itens">
@@ -1611,6 +1649,11 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Conferência SIGSS Insumos de um mês só</b> — a mesma escolha “Quais meses conferir?” da Conferência RH. Por padrão confere só os meses dos relatórios do SIGSS enviados. O <b>Conferir meu mês</b> também ganhou essa escolha, para o RH e os insumos.</div></div>
+          <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Produção: “Quem entrou em qual regra”</b> — quadro com cada profissional, o centro de custo da Planilha de Vínculos, a regra aplicada e o que foi contado. Quem ficou fora do lançamento aparece primeiro. O quadro também vai no Relatório Didático.</div></div>
+          <div class="nv-item regra"><span class="nv-data">23/10/2026</span><div><b>Regras do Analisador Produção</b> — nova tabela na página “Regras e alíquotas”: o que acontece com cada centro de custo (Médico, Enfermeiro, Técnico, ACS, Saúde Bucal, eMulti, Residente, Gerência…) e quais colunas do SIGSS entram.</div></div>
+          <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Pendências com o caminho da correção</b> — no Conferir meu mês, cada pendência traz botões para onde tirar o valor (SIGA, Drive, SIGSS), a ferramenta que ajuda e o passo a passo de lançamento do item.</div></div>
+          <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Reportar um problema</b> — a mensagem já abre endereçada à DCFI (leonardo.rios@betim.mg.gov.br e daivison.osmar@betim.mg.gov.br).</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Conferência RH de um mês só</b> — nova escolha “Quais meses conferir?”. Por padrão a conferência olha só os meses das planilhas do SIGA enviadas: dá para mandar o relatório do APURASUS do semestre e só a planilha de março, por exemplo. A opção “Todos os meses do relatório” continua igual à de antes.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Produção: Saúde Bucal</b> — profissionais com centro de custo de Saúde Bucal (ou Odonto) passam a ter a produção contada: <b>Procedimento</b> = coluna “Proc. odontológicos” do SIGSS. E, se algum profissional tiver produção que nenhuma regra aproveita, o painel agora avisa (“❓ Produção não contada”) em vez de deixar de fora sem aviso.</div></div>
           <div class="nv-item regra"><span class="nv-data">23/10/2026</span><div><b>Regra: residentes</b> — no Analisador Produção, o profissional cadastrado na Planilha de Vínculos com o centro de custo <b>RESIDENTE</b> tem a produção <b>separada</b>, como já acontece com a Gerência Geral: não entra na Sala de Procedimentos nem nos centros finais, e aparece no alerta “🎓 RESIDENTE” e no total separado.</div></div>
@@ -1872,6 +1915,15 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
             </div>
             <div class="crh-chips" id="csg-chips-drive"></div>
           </div>
+        </div>
+
+        <div class="crh-escopo">
+          <label for="csg-escopo">📅 <b>Quais meses conferir?</b></label>
+          <select id="csg-escopo">
+            <option value="sigss" selected>Só os meses dos relatórios do SIGSS que eu enviar (ex.: só março)</option>
+            <option value="todos">Todos os meses do relatório do APURASUS</option>
+          </select>
+          <small>Para conferir <b>um mês só</b>, envie o relatório do APURASUS (pode ser do semestre inteiro) e só o Estoque por unidade daquele mês. Na segunda opção, os meses sem relatório do SIGSS aparecem em cinza.</small>
         </div>
 
         <div class="btn-row">
@@ -2372,7 +2424,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
     <div><b style="font-size:.9rem">Vai junto na mensagem:</b><pre id="rep-ctx"></pre></div>
     <div class="rep-acoes"><button type="button" class="pri" onclick="REPORTAR.email()">✉️ Abrir no e-mail</button><button type="button" onclick="REPORTAR.copiar()">📋 Copiar mensagem</button></div>
     <div id="rep-ok" role="status"></div>
-    <small class="sub" style="margin:0">Se preferir, ligue para a DCFI: <b>(31) 3512-3336</b>. Se puder, anexe ao e-mail um print da tela.</small>
+    <small class="sub" style="margin:0">A mensagem vai para <b>leonardo.rios@betim.mg.gov.br</b> e <b>daivison.osmar@betim.mg.gov.br</b>. Se preferir, ligue para a DCFI: <b>(31) 3512-3336</b>. Se puder, anexe ao e-mail um print da tela.</small>
   </div>
 </dialog>
 <button class="ol-help" data-go="duv" title="Precisa de ajuda?">🙋 <span>Precisa de ajuda?</span></button>
@@ -4217,6 +4269,7 @@ const SIGSS = (function(){
   let finalWorkbookData = null;
   let ultimoAlertasTexto = [];
   let ultimoResumoInfo = null;
+  let ultimoQuem = [];
 
   function removerAcentos(str){
     if (!str) return "";
@@ -4282,6 +4335,8 @@ const SIGSS = (function(){
       let totalIgnoradoErro = 0;
       let totalIgnoradoAtencao = 0;
       let totalIgnoradoResidente = 0;
+      const quem = []; // quem entrou em qual regra
+      const regQ = (nome, cc, regra, contado, total, tipo) => quem.push({ nome, cc: cc || "—", regra, contado, total, tipo });
       let totalProfissionaisLidos = 0;
       let totalProntoLancamento = 0;
 
@@ -4401,6 +4456,7 @@ const SIGSS = (function(){
           alertasTexto.push(msgText);
           alertasHTML += `<div class="alert error"><span>🚨</span><div><strong>ERRO:</strong> Profissional <b>${nomeOriginal}</b> não localizado. <br><b>(Total Ignorado: ${pTotal})</b><br><small><i>Ação: Cadastre este profissional na Planilha de Vínculos.</i></small></div></div>`;
           errorCount++;
+          regQ(nomeOriginal, "", "Fora da Planilha de Vínculos", "nada (ignorado)", pTotal, "erro");
           continue;
         }
 
@@ -4414,6 +4470,7 @@ const SIGSS = (function(){
             alertasHTML += `<div class="alert error"><span>⛔</span><div><strong>ERRO CRÍTICO:</strong> O profissional <b>${nomeOriginal}</b> (GERÊNCIA GERAL) possui produção. <br><b>(Total Ignorado: ${pTotal})</b><br><small><i>Ação: Não lance. Peça à unidade para corrigir no SIGSS.</i></small></div></div>`;
             errorCount++;
           }
+          regQ(nomeOriginal, cc, "Gerência Geral", pTotal > 0 ? "nada (produção ignorada)" : "sem produção", pTotal, pTotal > 0 ? "erro" : "fora");
           continue;
         }
 
@@ -4427,6 +4484,7 @@ const SIGSS = (function(){
             alertasHTML += `<div class="alert warning"><span>🎓</span><div><strong>RESIDENTE:</strong> A produção de <b>${nomeOriginal}</b> foi separada: profissional residente não entra no APURASUS. <br><b>(Total separado: ${pTotal})</b><br><small><i>Ação: não lance esta produção (nem na Sala de Procedimentos, nem nos centros finais).</i></small></div></div>`;
             warningCount++;
           }
+          regQ(nomeOriginal, cc, "Residente", pTotal > 0 ? "nada (produção separada)" : "sem produção", pTotal, "fora");
           continue;
         }
 
@@ -4438,6 +4496,7 @@ const SIGSS = (function(){
             alertasTexto.push(msgText);
             alertasHTML += `<div class="alert warning"><span>⚠️</span><div><strong>ATENÇÃO (EMULTI/NASF):</strong> Produção de <b>${nomeOriginal}</b> IGNORADA (Unidade não é polo). <br><b>(Total Ignorado: ${pTotal})</b></div></div>`;
             warningCount++;
+            regQ(nomeOriginal, cc, "eMulti/NASF fora de unidade polo", "nada (ignorado)", pTotal, "atencao");
             continue;
           } else {
             addFinal(cc, "ATENDIMENTO", pAtend, `(Atendimentos: ${pAtend})`);
@@ -4446,34 +4505,42 @@ const SIGSS = (function(){
         }
 
         const prontoAntes = totalProntoLancamento;
+        const partes = []; let regraQ = "";
+        if (isNasfEmulti){ regraQ = "eMulti/NASF (unidade polo)"; partes.push(`Atendimento: ${pAtend}`); }
         let isAcs = ccLimpo.includes("AGENTE COMUNITARIO");
         if (!isAcs && pProc > 0){
           mapProcedimentos[cc] = (mapProcedimentos[cc] || 0) + pProc;
           totalProntoLancamento += pProc;
+          partes.push(`Sala de Procedimentos: ${pProc}`);
         }
 
         if (ccLimpo.includes("SAUDE BUCAL") || ccLimpo.includes("ODONTO")){
           /* Saúde Bucal / Odonto: Procedimento = coluna "Proc. odontológicos" */
           addFinal(cc, "PROCEDIMENTO", pOdonto, `(Proc. odontológicos: ${pOdonto})`);
           totalProntoLancamento += pOdonto;
+          regraQ = "Saúde Bucal / Odonto"; partes.push(`Procedimento: ${pOdonto} (Proc. odontológicos)`);
         }
         else if (ccLimpo.includes("MEDICO") || ccLimpo.includes("AMBULATORIO")){
           addFinal(cc, "ATENDIMENTO", pAtend, `(Apenas Atendimentos: ${pAtend})`);
           totalProntoLancamento += pAtend;
+          regraQ = ccLimpo.includes("MEDICO") ? "Médico" : "Ambulatório"; partes.push(`Atendimento: ${pAtend}`);
         }
         else if (ccLimpo.includes("ENFERMEIRO") && !ccLimpo.includes("TECNICO")){
           let somaEnf = pAtend + pTriagem;
           addFinal(cc, "ATENDIMENTO", somaEnf, `(${pAtend} Atend. + ${pTriagem} Triagem)`);
           totalProntoLancamento += somaEnf;
+          regraQ = "Enfermeiro"; partes.push(`Atendimento: ${somaEnf} (${pAtend} atend. + ${pTriagem} triagem)`);
         }
         else if (ccLimpo.includes("TECNICO")){
           let somaTec = pTriagem + pProc;
           addFinal(cc, "PROCEDIMENTO", somaTec, `(${pTriagem} Triagem + ${pProc} Proced.)`);
           totalProntoLancamento += somaTec;
+          regraQ = "Técnico de Enfermagem"; partes.push(`Procedimento: ${somaTec} (${pTriagem} triagem + ${pProc} proced.)`);
         }
         else if (isAcs){
           addFinal(cc, "VISITA", pAcs, `(Atividades ACS: ${pAcs})`);
           totalProntoLancamento += pAcs;
+          regraQ = "Agente Comunitário (ACS)"; partes.push(`Visita: ${pAcs}`);
         }
 
         /* rede de segurança: produção que nenhuma regra aproveitou não some calada */
@@ -4484,6 +4551,10 @@ const SIGSS = (function(){
           alertasTexto.push(msgText);
           alertasHTML += `<div class="alert warning"><span>❓</span><div><strong>PRODUÇÃO NÃO CONTADA:</strong> <b>${nomeOriginal}</b> (${cc}) tem produção no SIGSS, mas nenhuma regra do painel aproveitou. <br><b>(Total não contado: ${pTotal})</b><br><small><i>Ação: confira o centro de custo na Planilha de Vínculos e, se estiver certo, avise a DCFI.</i></small></div></div>`;
           warningCount++;
+          regQ(nomeOriginal, cc, regraQ || "Sem regra para este centro de custo", "nada (não contado)", pTotal, "atencao");
+        } else {
+          if (pVacProf > 0) partes.push(`Vacinas: ${pVacProf} (no total da Sala de Vacinas)`);
+          regQ(nomeOriginal, cc, regraQ || "Sem regra (sem produção para contar)", partes.join(" · ") || "sem produção", pTotal, "ok");
         }
       }
 
@@ -4510,6 +4581,17 @@ const SIGSS = (function(){
       `;
 
       document.getElementById('sigss-alerts-container').innerHTML = resumoHTML + alertasHTML;
+      {
+        const ordemQ = { erro:0, atencao:1, fora:2, ok:3 }, corQ = { erro:"q-erro", atencao:"q-aten", fora:"q-fora", ok:"q-ok" };
+        const lst = quem.slice().sort((a,b) => ordemQ[a.tipo]-ordemQ[b.tipo] || String(a.cc).localeCompare(String(b.cc)) || a.nome.localeCompare(b.nome));
+        const e = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+        const nFora = quem.filter(q => q.tipo !== "ok").length;
+        document.getElementById('sigss-quem').innerHTML = quem.length ? `<details class="cx-how quem" ${nFora ? "open" : ""}><summary>👥 Quem entrou em qual regra (${quem.length} profissionais${nFora ? ", " + nFora + " fora do lançamento" : ""})</summary>
+          <p class="sub" style="margin:6px 0 8px">Confira se cada profissional caiu na regra certa. A regra sai do <b>centro de custo da Planilha de Vínculos</b>. Os que não entram no lançamento aparecem primeiro.</p>
+          <input type="search" class="rg-busca" placeholder="Filtrar por nome, centro de custo ou regra…" oninput="const q=this.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();this.nextElementSibling.querySelectorAll('tbody tr').forEach(t=>t.hidden=q&&!t.textContent.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(q))" aria-label="Filtrar profissionais">
+          <div class="ol-tw"><table class="ol-t quem-t"><thead><tr><th>Profissional</th><th>Centro de custo (Planilha de Vínculos)</th><th>Regra aplicada</th><th>O que foi contado</th><th>Total no SIGSS</th></tr></thead><tbody>${lst.map(q => `<tr class="${corQ[q.tipo]}"><td>${e(q.nome)}</td><td>${e(q.cc)}</td><td><b>${e(q.regra)}</b></td><td>${e(q.contado)}</td><td class="n">${q.total}</td></tr>`).join("")}</tbody></table></div></details>` : "";
+        ultimoQuem = lst;
+      }
       document.getElementById('sigss-results-area').style.display = 'block';
       document.getElementById('sigss-results-area').scrollIntoView({ behavior: 'smooth' });
 
@@ -4561,6 +4643,12 @@ const SIGSS = (function(){
       ws_data.push(["SALA DE VACINAS", "VACINA APLICADA", totalVacinas, "(Total de Vacinas Extraídas do SIGSS)"]);
       addEmpty(2);
 
+      if (ultimoQuem.length){
+        ws_data.push(["=== QUEM ENTROU EM QUAL REGRA (CONFIRA O CENTRO DE CUSTO DE CADA PROFISSIONAL) ==="]);
+        ws_data.push(["PROFISSIONAL", "CENTRO DE CUSTO (PLANILHA DE VÍNCULOS)", "REGRA APLICADA", "O QUE FOI CONTADO", "TOTAL NO SIGSS"]);
+        ultimoQuem.forEach(q => ws_data.push([q.nome, q.cc, q.regra, q.contado, q.total]));
+        addEmpty(2);
+      }
       ws_data.push(["=== VALIDAÇÕES E ALERTAS (O QUE PRECISA DE ATENÇÃO?) ==="]);
       for (let alerta of alertasTexto){
         ws_data.push([alerta]);
@@ -6257,7 +6345,8 @@ async function processar(){
   catch(e){ console.error(e); setStatus("Erro: " + e.message, "err"); }
   finally { btn.disabled = false; btn.innerHTML = txt; }
 }
-async function rodar(fa, fs, fd){
+async function rodar(fa, fs, fd, opts){
+  const escopo = (opts && opts.escopo) || ($("csg-escopo") ? $("csg-escopo").value : "sigss");
   setStatus("Lendo os arquivos…","");
   {
     const apura = await lerApura(fa);
@@ -6271,7 +6360,13 @@ async function rodar(fa, fs, fd){
       if (sig[s.mes]){ avisos.push(`Há dois relatórios do SIGSS para ${s.mes} (“${sig[s.mes].nome}” e “${s.nome}”). Usei só o primeiro.`); chips.push([s.mes+" repetido","dup"]); continue; }
       sig[s.mes] = s; chips.push([s.mes,"ok"]);
     }
-    apura.meses.filter(m => !sig[m]).forEach(m => chips.push([m+" sem SIGSS","miss"]));
+    if (escopo !== "todos"){
+      const so = apura.meses.filter(m => sig[m]), semSig = apura.meses.filter(m => !sig[m]);
+      if (!so.length) throw new Error(`nenhum relatório do SIGSS é de um mês que está no relatório do APURASUS. Relatório: ${apura.meses.join(", ")}. SIGSS: ${Object.keys(sig).join(", ") || "nenhum"}.`);
+      if (semSig.length) avisos.push(`Conferi só ${so.join(", ")} (o${so.length>1?"s meses":" mês"} dos relatórios do SIGSS enviados). Os outros meses do relatório (${semSig.join(", ")}) ficaram de fora. Para conferir todos, envie também os relatórios do SIGSS deles ou escolha “Todos os meses do relatório”.`);
+      apura.meses = so;
+      apura.periodo = so.length === 1 ? so[0] : so[0] + " a " + so[so.length-1];
+    } else apura.meses.filter(m => !sig[m]).forEach(m => chips.push([m+" sem SIGSS","miss"]));
     $("csg-chips").innerHTML = chips.map(([t,c]) => `<span class="crh-chip ${c}">${c==="ok"?"✓ ":""}${esc(t)}</span>`).join("") +
       (unidades.size ? `<span class="csg-unid">Unidade no SIGSS: <b>${esc([...unidades].join(" · "))}</b></span>` : "");
     if (unidades.size > 1) avisos.push(`Os relatórios do SIGSS são de unidades diferentes: ${[...unidades].join(", ")}.`);
@@ -6360,20 +6455,40 @@ const CMES = (function(){
     const r = { feito:{} }, erros = [];
     try{
       if (fd){ st("Conferindo com o Drive…"); try{ r.drive = await CONF.processar({apura:fa, drive:fd, lote:true}); r.feito.drive = !!r.drive; }catch(e){ erros.push("Drive: "+e.message); } }
-      if (fsg.length){ st("Conferindo o RH com o SIGA…"); try{ r.rh = await CRH.rodar(fa, fsg); r.feito.rh = true; }catch(e){ erros.push("RH: "+e.message); } }
-      if (fss.length){ st("Conferindo os insumos com o SIGSS…"); try{ r.sigss = await CSG.rodar(fa, fss, fd); r.feito.sigss = true; }catch(e){ erros.push("SIGSS: "+e.message); } }
+      const todos = $("cm-escopo") && $("cm-escopo").value === "todos";
+      if (fsg.length){ st("Conferindo o RH com o SIGA…"); try{ r.rh = await CRH.rodar(fa, fsg, { escopo: todos ? "todos" : "siga" }); r.feito.rh = true; }catch(e){ erros.push("RH: "+e.message); } }
+      if (fss.length){ st("Conferindo os insumos com o SIGSS…"); try{ r.sigss = await CSG.rodar(fa, fss, fd, { escopo: todos ? "todos" : "sigss" }); r.feito.sigss = true; }catch(e){ erros.push("SIGSS: "+e.message); } }
       ult = r; mostrar(r, erros);
       st(erros.length ? "Conferência feita, com avisos." : "Pronto! Veja as pendências abaixo e baixe a planilha única.", erros.length ? "err" : "ok");
     } finally { btn.disabled = false; btn.innerHTML = txt; }
   }
 
+  /* caminho da correção: para cada pendência, onde tirar o valor e onde corrigir */
+  function correcao(item){
+    const n = String(item).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase();
+    const b = (attr, txt) => `<button type="button" class="cm-fix" ${attr}>${txt}</button>`;
+    const out = [];
+    if (/HORA EXTRA|REMUNERACAO A PESSOAL( -| –)? ?(CLT|ESTATUTARIO)|BENEFICIO/.test(n) && !/MAIS MEDICOS/.test(n)){
+      out.push(b('data-guide="sigaFolha"', "📸 Tirar a planilha no SIGA"), b('data-go="rh"', "🧾 Abrir o Analisador Folha"));
+      if (/REMUNERACAO/.test(n)) out.push(b('data-guide="aliquota"', "％ Conferir as alíquotas"));
+    }
+    else if (/MAIS MEDICOS/.test(n)) out.push(b('data-guide="drvMM"', "📸 Mais Médicos no Drive"));
+    else if (/MEDICAMENTOS|MEDICO.?HOSPITALAR/.test(n)) out.push(b('data-guide="divMMH"', "🧮 Somar e dividir"), b('data-go="estoque-sigss"', "📦 Abrir o Analisador Estoque"));
+    else if (/LIMPEZA|ODONTOLOG|FORMULAS|COPA|EXPEDIENTE|PROTECAO/.test(n)) out.push(b('data-guide="sigssEst"', "📸 Tirar o Estoque no SIGSS"), b('data-go="estoque-sigss"', "📦 Abrir o Analisador Estoque"));
+    else if (/SERVICOS MEDICOS/.test(n)) out.push(b('data-guide="drvPJ"', "📸 Médicos PJ no Drive"));
+    else out.push(b('data-guide="drvUnidade"', "📸 Achar o valor no Drive"));
+    const i = (typeof D !== "undefined") ? D.findIndex(d => { const a = String(d[0]).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim(); const k = n.replace(/[^A-Z ]/g," ").replace(/\s+/g," ").trim(); return a === k || (a.length > 6 && k.includes(a)) || (k.length > 6 && a.includes(k)); }) : -1;
+    if (i >= 0) out.push(b(`data-itemguide="${i}"`, "📖 Como lançar no APURASUS"));
+    return `<span class="cm-fixes">${out.join("")}</span>`;
+  }
+
   function listas(r){
     const g = [];
-    if (r.feito.drive) g.push({ id:"drive", ic:"📁", nome:"Drive", aba:"conf-drive", itens: r.drive.pendencias.map(p=>`<b>${esc(p.item)}</b> — falta lançar (${esc(p.meses)})`), txt: r.drive.pendencias.map(p=>[p.item, "Falta lançar: "+p.meses]) });
+    if (r.feito.drive) g.push({ id:"drive", ic:"📁", nome:"Drive", aba:"conf-drive", itens: r.drive.pendencias.map(p=>`<b>${esc(p.item)}</b> — falta lançar (${esc(p.meses)})` + correcao(p.item)), txt: r.drive.pendencias.map(p=>[p.item, "Falta lançar: "+p.meses]) });
     else g.push({ id:"drive", ic:"📁", nome:"Drive", aba:"conf-drive", off:true });
-    if (r.feito.rh) g.push({ id:"rh", ic:"🧾", nome:"RH (SIGA)", aba:"conf-rh", itens: r.rh.RES.pend.map(p=>`<b>${esc(p.item)}</b> — ${esc(p.txt)}`), txt: r.rh.RES.pend.map(p=>[p.item, p.txt]) });
+    if (r.feito.rh) g.push({ id:"rh", ic:"🧾", nome:"RH (SIGA)", aba:"conf-rh", itens: r.rh.RES.pend.map(p=>`<b>${esc(p.item)}</b> — ${esc(p.txt)}` + correcao(p.item)), txt: r.rh.RES.pend.map(p=>[p.item, p.txt]) });
     else g.push({ id:"rh", ic:"🧾", nome:"RH (SIGA)", aba:"conf-rh", off:true });
-    if (r.feito.sigss) g.push({ id:"sigss", ic:"💊", nome:"Insumos (SIGSS)", aba:"conf-sigss", itens: r.sigss.RES.pend.map(p=>{ const i = p.indexOf(" - "); return `<b>${esc(p.slice(0,i))}</b> — ${esc(p.slice(i+3))}`; }), txt: r.sigss.RES.pend.map(p=>{ const i = p.indexOf(" - "); return [p.slice(0,i), p.slice(i+3)]; }) });
+    if (r.feito.sigss) g.push({ id:"sigss", ic:"💊", nome:"Insumos (SIGSS)", aba:"conf-sigss", itens: r.sigss.RES.pend.map(p=>{ const i = p.indexOf(" - "); return `<b>${esc(p.slice(0,i))}</b> — ${esc(p.slice(i+3))}` + correcao(p.slice(0,i)); }), txt: r.sigss.RES.pend.map(p=>{ const i = p.indexOf(" - "); return [p.slice(0,i), p.slice(i+3)]; }) });
     else g.push({ id:"sigss", ic:"💊", nome:"Insumos (SIGSS)", aba:"conf-sigss", off:true });
     return g;
   }
@@ -6513,9 +6628,9 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 33, data: "23/10/2026" };
+const PAINEL_VERSAO = { n: 34, data: "23/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
-const DCFI_CONTATO = { email: "", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
+const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
 
 /* ---------- selo da versão ---------- */
@@ -6589,7 +6704,7 @@ const REPORTAR = (function(){
   function abrir(){ $r("rep-ctx").textContent = contexto(); $r("rep-ok").textContent = ""; $r("rep-dlg").showModal(); setTimeout(() => $r("rep-txt").focus(), 50); }
   function email(){
     const assunto = "Painel APURASUS — problema" + (ctx && ctx.u ? " — " + ctx.u : "");
-    location.href = "mailto:" + encodeURIComponent(DCFI_CONTATO.email) + "?subject=" + encodeURIComponent(assunto) + "&body=" + encodeURIComponent(texto());
+    location.href = "mailto:" + DCFI_CONTATO.email.split(",").map(e => encodeURIComponent(e.trim())).join(",") + "?subject=" + encodeURIComponent(assunto) + "&body=" + encodeURIComponent(texto());
     $r("rep-ok").textContent = "Se o e-mail não abriu, use “Copiar mensagem” e cole no seu e-mail ou WhatsApp.";
   }
   async function copiar(){

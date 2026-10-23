@@ -27,7 +27,8 @@ Abra o arquivo num editor de texto (Bloco de Notas, Notepad++ ou VS Code) e proc
 | O que mudar | Procure por | Observação |
 |---|---|---|
 | Número e data da versão | `const PAINEL_VERSAO` | Aumente o número a cada versão publicada. |
-| Telefone e e-mail da DCFI do botão "Reportar um problema" | `const DCFI_CONTATO` | Preencha o `email` para a mensagem já abrir com o destinatário. |
+| Telefone e e-mails da DCFI do botão "Reportar um problema" | `const DCFI_CONTATO` | E-mails separados por vírgula. Mude também o texto do diálogo (procure por `A mensagem vai para`). |
+| Regras do Analisador Produção (qual centro de custo vira qual item) | `ccLimpo.includes(` | A tabela da página Regras fica em `id="rg-producao"`: atualize as duas juntas. |
 | Alíquotas (encargos) e provisão | `REGRAS_APURASUS` | Bloco `aliquotas`: uma linha por período (`de`, `ate`, `clt`, `est`, `mun`, `prov`). A conferência RH, o guia de encargos e a página Regras usam esse bloco. |
 | Tabela de itens: fonte e onde lançar (conferências) | `REGRAS_APURASUS` › `fontes` | Usada pelas conferências. |
 | Itens da página "Onde lanço?" (nome, centro de custo, fonte, observação, caminho) | `const D = [` | Uma lista por item, na ordem: nome, centro de custo, fonte, observação, classificação, caminho no APURASUS. |
