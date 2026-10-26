@@ -715,6 +715,25 @@ body.nav-pinned .app-main{margin-left:300px;width:calc(100% - 300px)}
 .gs-it b{display:block;font-size:.98rem}.gs-it small{color:var(--muted);font-size:.8rem}
 .gs-none{padding:12px;color:var(--muted)}
 .gs-flash{outline:4px solid var(--amber);outline-offset:4px;border-radius:6px;transition:outline-color .4s}
+/* =============== V35: tour, checagem de vínculos, quem entrou onde (folha) =============== */
+.tour-hl{position:fixed;z-index:9998;border-radius:14px;box-shadow:0 0 0 4px var(--amber),0 0 0 9999px rgba(6,21,15,.6);pointer-events:none;transition:all .25s ease}
+.tour-bx{position:fixed;z-index:9999;background:var(--card);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:14px 16px;box-shadow:6px 6px 0 var(--amber);font-size:.95rem}
+.tour-bx b{display:block;font-size:1.05rem;margin-bottom:4px}.tour-bx p{margin:0 0 12px;line-height:1.45}
+.tour-n{font-size:.75rem;font-weight:800;letter-spacing:.05em;color:var(--sus);text-transform:uppercase;margin-bottom:4px}
+.tour-ac{display:flex;justify-content:space-between;gap:8px}
+.tour-ac button{font:inherit;font-weight:800;border-radius:10px;padding:8px 14px;cursor:pointer;border:2px solid var(--ink);background:var(--card);color:var(--ink)}
+.tour-ac .tour-prox{background:var(--sus);color:#fff}
+@media (prefers-reduced-motion:reduce){.tour-hl{transition:none}}
+@media print{.tour-hl,.tour-bx{display:none!important}}
+.vinc-box{border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--card)}
+.vinc-box h4{margin:0 0 8px;font-size:1rem}
+.vinc-ok{color:var(--sus);font-weight:700}
+.vinc-grp{margin:6px 0}.vinc-grp summary{cursor:pointer;font-weight:700}
+.vinc-grp ul{margin:6px 0 4px;padding-left:20px;columns:2;column-gap:28px}
+@media (max-width:640px){.vinc-grp ul{columns:1}}
+.vinc-grp.bad summary{color:#b91c1c}.vinc-grp.warn summary{color:#92400e}.vinc-grp.info summary{color:var(--muted)}
+.hrq{margin-top:14px}
+.hrq .ol-t td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 /* =============== V30: versão, aviso de versão nova, reportar problema =============== */
 .cm-fixes{display:flex;flex-wrap:wrap;gap:6px;margin:5px 0 2px}
 .cm-fix{font:inherit;font-size:.8rem;font-weight:700;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:999px;padding:3px 10px;cursor:pointer}
@@ -1011,6 +1030,9 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
   <button role="tab" aria-selected="false" data-t="novidades">
     <span class="icon">🆕</span> <span class="text">Novidades</span>
   </button>
+  <button type="button" class="sb-search sb-tour" id="sb-tour" title="Mostra em 5 balões onde fica cada coisa">
+    <span class="icon">🧭</span> <span class="text">Tour do painel</span>
+  </button>
   <button type="button" class="sb-pin" id="sb-pin" aria-pressed="false">
     <span class="icon">📌</span> <span class="text" id="sb-pin-t">Manter menu aberto</span>
   </button>
@@ -1247,6 +1269,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
           <button class="btn btn-secondary" onclick="HR.clear()">🧹 Limpar Tudo (Alt+L)</button>
         </div>
         <div id="hr-status"></div>
+        <div id="hr-quem"></div>
       </div>
     </section>
 
@@ -1294,6 +1317,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
           <div class="status-box" id="sigss-status-info"></div>
           <h3 style="font-size:16px;margin-bottom:12px;">Validações e Alertas do Mês</h3>
           <div class="alerts-scroll" id="sigss-alerts-container"></div>
+          <div id="sigss-vinc"></div>
           <div id="sigss-quem"></div>
           <div class="btn-row">
             <button class="btn btn-download" onclick="SIGSS.downloadExcel()">📥 Baixar Relatório Didático APURASUS</button>
@@ -1649,6 +1673,9 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Analisador Produção: checagem da Planilha de Vínculos</b> — antes do resultado, o painel mostra quem tem produção no SIGSS e não está na planilha, nomes repetidos com centros de custo diferentes, linhas sem centro de custo, centros de custo que nenhuma regra reconhece e quem está na planilha mas não apareceu no SIGSS. Botão para <b>baixar a planilha de vínculos com os nomes que faltam</b>.</div></div>
+          <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Analisador Folha: “Quem entrou em qual centro de custo”</b> — lista os servidores que ficaram sem centro de custo, com o valor de cada um, e o total por centro de custo.</div></div>
+          <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Tour do painel</b> — na primeira visita, 5 balões mostram a busca, a unidade e o mês, o passo a passo, o Conferir meu mês e o botão de reportar problema. Para ver de novo: menu “🧭 Tour do painel”.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Conferência SIGSS Insumos de um mês só</b> — a mesma escolha “Quais meses conferir?” da Conferência RH. Por padrão confere só os meses dos relatórios do SIGSS enviados. O <b>Conferir meu mês</b> também ganhou essa escolha, para o RH e os insumos.</div></div>
           <div class="nv-item"><span class="nv-data">23/10/2026</span><div><b>Analisador Produção: “Quem entrou em qual regra”</b> — quadro com cada profissional, o centro de custo da Planilha de Vínculos, a regra aplicada e o que foi contado. Quem ficou fora do lançamento aparece primeiro. O quadro também vai no Relatório Didático.</div></div>
           <div class="nv-item regra"><span class="nv-data">23/10/2026</span><div><b>Regras do Analisador Produção</b> — nova tabela na página “Regras e alíquotas”: o que acontece com cada centro de custo (Médico, Enfermeiro, Técnico, ACS, Saúde Bucal, eMulti, Residente, Gerência…) e quais colunas do SIGSS entram.</div></div>
@@ -2383,6 +2410,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
       <details><summary>“O somatório dos valores informados é diferente do valor total”</summary><div>O que você distribuiu entre os centros não fecha com o valor do item. Ajuste até o “valor restante” ficar verde e zerado.</div></details>
       <details><summary>Como sei se os valores de RH (folha) foram lançados certo?</summary><div>Use a <button class="ol-lnk" data-go="conf-rh">🧾 Conferência RH</button>: envie o relatório Custo Total da Unidade e as planilhas do SIGA. Ela soma provisão e encargos e mostra o que está menor, maior ou não lançado.</div></details>
       <details><summary>Como sei se os insumos do SIGSS foram lançados certo?</summary><div>Use a <button class="ol-lnk" data-go="conf-sigss">💊 Conferência SIGSS Insumos</button>: envie o relatório Custo Total da Unidade e o Estoque por unidade do SIGSS em Excel (e a planilha do Drive para Limpeza e Odontológico). Ela mostra o que está menor, maior ou não lançado e qual bloco do relatório ficou de fora.</div></details>
+      <details><summary>Quero ver de novo o tour do painel</summary><div>O tour mostra, em 5 balões, a busca, a unidade e o mês, o passo a passo, o Conferir meu mês e o botão de reportar problema. <button class="ol-lnk" type="button" onclick="TOUR.iniciar()">🧭 Ver o tour agora</button></div></details>
       <details><summary>Quero ver de novo a tela de abertura</summary><div>Ela aparece só na primeira visita. <button class="ol-lnk" type="button" onclick="try{localStorage.removeItem('apurasus_visto')}catch(e){};location.reload()">Mostrar a tela de abertura de novo</button></div></details>
       <details><summary>Onde vejo custo, produção e custo unitário de todas as unidades?</summary><div>No <button class="ol-lnk" data-go="pngc">📈 Relatório PNGC</button> (Gestão e indicadores). Ele usa as bases de custo e de produção do APURASUS, confere a qualidade dos lançamentos, compara as unidades e gera o relatório mensal de cada uma em PDF.</div></details>
       <details><summary>Como sei se lancei tudo o que está no Drive?</summary><div>Use a <button class="ol-lnk" data-go="conf-drive">🔄 Conferência Drive</button>: envie o relatório Custo Total da Unidade e a planilha da unidade do Drive.</div></details>
@@ -2473,6 +2501,7 @@ btnTheme.addEventListener('click', () => {
    ====================================================== */
 function fecharAbertura() {
   try{ localStorage.setItem('apurasus_visto','1'); }catch(e){}
+  setTimeout(() => { if (typeof TOUR !== "undefined") TOUR.talvez(); }, 900);
   const splash = document.getElementById('splash-screen');
   if (splash) {
     splash.classList.add('hidden');
@@ -3671,6 +3700,7 @@ $("#rs").onclick=()=>{if(confirm("Reiniciar as etapas e os itens deste mês?")){
 
 /* NAVEGAÇÃO DE ABAS UNIFICADA */
 function go(t){
+  if (typeof TOUR !== "undefined" && TOUR.ativo()) TOUR.fim();
   document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x.dataset.t===t));
   document.querySelectorAll("main section").forEach(s=>s.classList.toggle("on",s.id===t));
   window.scrollTo({top:0,behavior:"smooth"});
@@ -3697,6 +3727,7 @@ const HR = (function(){
     document.getElementById('hr-drop-main-text').textContent = 'Arraste o arquivo aqui ou clique para escolher';
     document.getElementById('hr-drop-ref-text').textContent = 'Arraste o arquivo aqui ou clique para escolher';
     const statusDiv = document.getElementById('hr-status');
+    const hq = document.getElementById('hr-quem'); if (hq) hq.innerHTML = '';
     statusDiv.innerText = 'Pronto para novos arquivos.';
     statusDiv.style.color = '#333';
   }
@@ -3974,6 +4005,30 @@ const HR = (function(){
         let valB = String(b[ccIdx] || '').toUpperCase();
         return valA.localeCompare(valB);
       });
+
+      /* quem entrou em qual centro de custo (e quem ficou sem) */
+      try {
+        const valCols = []; globalGroupedTargetCols.forEach(arr => arr.forEach(o => valCols.push(o.index)));
+        const somaLinha = row => valCols.reduce((s, i) => s + (typeof row[i] === 'number' ? row[i] : 0), 0);
+        const nomeIdxQ = headerRow.findIndex(h => h && normalizeStr(h) === 'NOME');
+        const fmtQ = v => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+        const eQ = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+        const semCC = [], porCC = {};
+        dataRows.forEach(row => {
+          const cc = String(row[ccIdx] || ''), v = somaLinha(row);
+          if (cc.startsWith('APAGUE AQUI')) semCC.push({ nome: row[nomeIdxQ], v });
+          else { porCC[cc] = porCC[cc] || { n:0, v:0 }; porCC[cc].n++; porCC[cc].v += v; }
+        });
+        const totSem = semCC.reduce((s, x) => s + x.v, 0), totCom = Object.values(porCC).reduce((s, x) => s + x.v, 0);
+        const semRef = !fileRef.files.length;
+        document.getElementById('hr-quem').innerHTML = `<details class="cx-how hrq" ${semCC.length ? 'open' : ''}><summary>👥 Quem entrou em qual centro de custo (${dataRows.length} servidores${semCC.length ? ', ' + semCC.length + ' sem centro de custo' : ''})</summary>`
+          + (semRef ? `<div class="alert warning">⚠️ <span>Você não enviou a <b>Planilha 2 (referência)</b>: todos os servidores ficaram sem centro de custo. Envie a planilha com NOME, LOTACAO e CENTRO DE CUSTO para o painel preencher sozinho.</span></div>` : '')
+          + (semCC.length ? `<div class="alert ${semRef ? 'warning' : 'error'}">${semRef ? '⚠️' : '🚨'} <span><b>${semCC.length} servidor(es) sem centro de custo</b>, somando <b>${fmtQ(totSem)}</b> em remunerações, benefícios e hora extra. Na planilha baixada eles aparecem com “APAGUE AQUI E DIGITE O CENTRO DE CUSTO”: preencha antes de lançar e, para os próximos meses, inclua-os na planilha de referência.</span></div>`
+              + `<div class="ol-tw"><table class="ol-t"><thead><tr><th>Servidor sem centro de custo</th><th>Valor (remunerações, benefícios, HE)</th></tr></thead><tbody>${semCC.map(x => `<tr><td>${eQ(x.nome)}</td><td class="n">${fmtQ(x.v)}</td></tr>`).join('')}</tbody></table></div>`
+              : `<p class="vinc-ok" style="margin:8px 0">✅ Todos os servidores têm centro de custo.</p>`)
+          + (Object.keys(porCC).length ? `<div class="ol-tw" style="margin-top:10px"><table class="ol-t"><thead><tr><th>Centro de custo</th><th>Servidores</th><th>Valor</th></tr></thead><tbody>${Object.entries(porCC).sort((a,b) => a[0].localeCompare(b[0])).map(([c, x]) => `<tr><td>${eQ(c)}</td><td class="n">${x.n}</td><td class="n">${fmtQ(x.v)}</td></tr>`).join('')}<tr><td><b>Total com centro de custo</b></td><td class="n"><b>${Object.values(porCC).reduce((s,x)=>s+x.n,0)}</b></td><td class="n"><b>${fmtQ(totCom)}</b></td></tr></tbody></table></div>` : '')
+          + `</details>`;
+      } catch (eq) { console.error('quem folha', eq); }
 
       let lotacaoData = [headerRow, ...dataRows];
       let totalRows = lotacaoData.length;
@@ -4270,6 +4325,18 @@ const SIGSS = (function(){
   let ultimoAlertasTexto = [];
   let ultimoResumoInfo = null;
   let ultimoQuem = [];
+  let ultimoVinc = null;
+  function baixarVinculos(){
+    if (!ultimoVinc || !ultimoVinc.faltam.length) return;
+    const linhas = ultimoVinc.json.map(l => (l || []).slice());
+    if (linhas.length && linhas[0] && removerAcentos(String(linhas[0][0] || "")) === "PROFISSIONAL" && !linhas[0][2]) linhas[0][2] = "OBSERVAÇÃO";
+    ultimoVinc.faltam.forEach(f => linhas.push([f.nome, "", "NOVO: preencha o centro de custo (tinha produção no SIGSS e não estava na planilha)"]));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(linhas); ws["!cols"] = [{wch:42},{wch:45},{wch:70}];
+    XLSX.utils.book_append_sheet(wb, ws, (ultimoVinc.wb.SheetNames[0] || "Vínculos").slice(0,31));
+    ultimoVinc.wb.SheetNames.slice(1).forEach(n => XLSX.utils.book_append_sheet(wb, ultimoVinc.wb.Sheets[n], n.slice(0,31)));
+    XLSX.writeFile(wb, `Planilha_Vinculos_${String(ultimoVinc.unidade || "unidade").replace(/[^\wÀ-ú]+/g,"_")}_com_nomes_novos.xlsx`);
+  }
 
   function removerAcentos(str){
     if (!str) return "";
@@ -4299,6 +4366,7 @@ const SIGSS = (function(){
     document.getElementById('sigss-results-area').style.display = 'none';
     document.getElementById('sigss-alerts-container').innerHTML = '';
     document.getElementById('sigss-status-info').innerHTML = '';
+    ['sigss-vinc','sigss-quem'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = ''; });
     finalWorkbookData = null;
     ultimoAlertasTexto = [];
     ultimoResumoInfo = null;
@@ -4335,6 +4403,7 @@ const SIGSS = (function(){
       let totalIgnoradoErro = 0;
       let totalIgnoradoAtencao = 0;
       let totalIgnoradoResidente = 0;
+      const sigssNomes = new Set(), faltamVinc = [];
       const quem = []; // quem entrou em qual regra
       const regQ = (nome, cc, regra, contado, total, tipo) => quem.push({ nome, cc: cc || "—", regra, contado, total, tipo });
       let totalProfissionaisLidos = 0;
@@ -4350,9 +4419,14 @@ const SIGSS = (function(){
           ccHeaderIdx = i; break;
         }
       }
+      const vincOrig = {}, vincDup = [], vincSemCC = [];
       for (let i = ccHeaderIdx + 1; i < jsonCC.length; i++){
+        if (!jsonCC[i]) continue;
+        if (jsonCC[i][0] && !jsonCC[i][1]) { vincSemCC.push(jsonCC[i][0].toString().trim()); continue; }
         if (jsonCC[i][0] && jsonCC[i][1]){
-          ccMap[removerAcentos(jsonCC[i][0].toString())] = jsonCC[i][1].toString().trim();
+          const k = removerAcentos(jsonCC[i][0].toString()), v = jsonCC[i][1].toString().trim();
+          if (ccMap[k] && removerAcentos(ccMap[k]) !== removerAcentos(v)) vincDup.push(`${jsonCC[i][0].toString().trim()}: “${ccMap[k]}” e “${v}” (vale o primeiro)`);
+          if (!ccMap[k]) { ccMap[k] = v; vincOrig[k] = jsonCC[i][0].toString().trim(); }
         }
       }
 
@@ -4440,6 +4514,7 @@ const SIGSS = (function(){
         }
 
         totalProfissionaisLidos++;
+        sigssNomes.add(nome);
 
         let pAtend = parseFloat(row[colMap.atend]) || 0;
         let pTriagem = parseFloat(row[colMap.triagem]) || 0;
@@ -4457,6 +4532,7 @@ const SIGSS = (function(){
           alertasHTML += `<div class="alert error"><span>🚨</span><div><strong>ERRO:</strong> Profissional <b>${nomeOriginal}</b> não localizado. <br><b>(Total Ignorado: ${pTotal})</b><br><small><i>Ação: Cadastre este profissional na Planilha de Vínculos.</i></small></div></div>`;
           errorCount++;
           regQ(nomeOriginal, "", "Fora da Planilha de Vínculos", "nada (ignorado)", pTotal, "erro");
+          faltamVinc.push({ nome: nomeOriginal, total: pTotal });
           continue;
         }
 
@@ -4582,6 +4658,25 @@ const SIGSS = (function(){
 
       document.getElementById('sigss-alerts-container').innerHTML = resumoHTML + alertasHTML;
       {
+        /* Checagem da Planilha de Vínculos x relatório do SIGSS */
+        const e = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+        const temRegra = c => { const n = removerAcentos(c); return /GERENCIA GERAL|RESIDENT|NASF|EMULTI|SAUDE BUCAL|ODONTO|MEDICO|AMBULATORIO|ENFERMEIRO|TECNICO|AGENTE COMUNITARIO/.test(n); };
+        const sobram = Object.keys(ccMap).filter(k => !sigssNomes.has(k)).map(k => `${vincOrig[k] || k} (${ccMap[k]})`);
+        const ccSemRegra = [...new Set(Object.values(ccMap))].filter(c => !temRegra(c)).map(c => `${c}: ${Object.keys(ccMap).filter(k => ccMap[k] === c).length} profissional(is)`);
+        const grupos = [
+          { cls:"bad", t:`Têm produção no SIGSS, mas não estão na planilha (${faltamVinc.length})`, dica:"A produção deles foi ignorada. Inclua o nome e o centro de custo na planilha (botão abaixo).", itens: faltamVinc.map(f => `${f.nome} — total ${f.total}`) },
+          { cls:"warn", t:`Nome repetido com centros de custo diferentes (${vincDup.length})`, dica:"Deixe só uma linha por profissional, com o centro de custo certo.", itens: vincDup },
+          { cls:"warn", t:`Na planilha, mas sem centro de custo (${vincSemCC.length})`, dica:"Preencha a coluna do centro de custo.", itens: vincSemCC },
+          { cls:"warn", t:`Centro de custo que nenhuma regra de produção reconhece (${ccSemRegra.length})`, dica:"Desses profissionais só entram os procedimentos realizados (Sala de Procedimentos). Confira se o nome do centro de custo está certo; veja as regras na página Regras e alíquotas.", itens: ccSemRegra },
+          { cls:"info", t:`Na planilha, mas sem linha no relatório do SIGSS (${sobram.length})`, dica:"Pode ser quem saiu da unidade, está de férias ou teve o nome escrito diferente no SIGSS. Se saiu, pode tirar da planilha.", itens: sobram }
+        ].filter(g => g.itens.length);
+        ultimoVinc = { faltam: faltamVinc, json: jsonCC, wb: vinculosWb, unidade: unitName, grupos };
+        document.getElementById('sigss-vinc').innerHTML = `<div class="vinc-box"><h4>🔎 Checagem da Planilha de Vínculos</h4>` +
+          (grupos.length ? grupos.map(g => `<details class="vinc-grp ${g.cls}" ${g.cls==="bad"?"open":""}><summary>${e(g.t)}</summary><small class="sub">${e(g.dica)}</small><ul>${g.itens.map(x=>`<li>${e(x)}</li>`).join("")}</ul></details>`).join("")
+            : `<span class="vinc-ok">✅ A planilha está em dia: todo profissional com produção no SIGSS tem centro de custo, sem nomes repetidos.</span>`) +
+          (faltamVinc.length ? `<div class="btn-row" style="margin-top:10px"><button type="button" class="btn btn-secondary" onclick="SIGSS.baixarVinculos()">📥 Baixar a planilha de vínculos com os nomes que faltam</button></div><small class="sub">A planilha baixada é a mesma que você enviou, com os ${faltamVinc.length} nome(s) novo(s) no fim e o centro de custo em branco para preencher.</small>` : "") + `</div>`;
+      }
+      {
         const ordemQ = { erro:0, atencao:1, fora:2, ok:3 }, corQ = { erro:"q-erro", atencao:"q-aten", fora:"q-fora", ok:"q-ok" };
         const lst = quem.slice().sort((a,b) => ordemQ[a.tipo]-ordemQ[b.tipo] || String(a.cc).localeCompare(String(b.cc)) || a.nome.localeCompare(b.nome));
         const e = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -4643,6 +4738,11 @@ const SIGSS = (function(){
       ws_data.push(["SALA DE VACINAS", "VACINA APLICADA", totalVacinas, "(Total de Vacinas Extraídas do SIGSS)"]);
       addEmpty(2);
 
+      if (ultimoVinc && ultimoVinc.grupos.length){
+        ws_data.push(["=== CHECAGEM DA PLANILHA DE VÍNCULOS ==="]);
+        ultimoVinc.grupos.forEach(g => { ws_data.push([g.t]); g.itens.forEach(x => ws_data.push(["   " + x])); });
+        addEmpty(2);
+      }
       if (ultimoQuem.length){
         ws_data.push(["=== QUEM ENTROU EM QUAL REGRA (CONFIRA O CENTRO DE CUSTO DE CADA PROFISSIONAL) ==="]);
         ws_data.push(["PROFISSIONAL", "CENTRO DE CUSTO (PLANILHA DE VÍNCULOS)", "REGRA APLICADA", "O QUE FOI CONTADO", "TOTAL NO SIGSS"]);
@@ -4758,7 +4858,7 @@ const SIGSS = (function(){
     XLSX.writeFile(wb, "Relatorio_Analise_SIGSS_Didatico.xlsx");
   }
 
-  return { processData, limpar, downloadExcel };
+  return { processData, limpar, downloadExcel, baixarVinculos };
 })();
 
 /* ======================================================
@@ -6628,7 +6728,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 34, data: "23/10/2026" };
+const PAINEL_VERSAO = { n: 35, data: "26/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
@@ -6761,6 +6861,73 @@ function imprimirChecklist(){
     p.innerHTML = "🔒 <b>Seus arquivos não saem deste computador.</b> O painel lê as planilhas aqui mesmo, no navegador, e não envia nada para a internet.";
     alvo.parentElement.insertBefore(p, alvo);
   });
+})();
+
+/* =====================================================================
+   V35: tour de primeira visita (5 balões; reabre pelo menu ou pela página de dúvidas)
+   ===================================================================== */
+const TOUR = (function(){
+  const CHAVE = "apurasus_tour_v1";
+  const PASSOS = [
+    { alvo: ".ctx .gs", t: "🔎 Busque qualquer coisa aqui", x: "Escreva do seu jeito: <i>conta de luz</i>, <i>salário</i>, <i>esqueci a senha</i>, <i>relato do mês</i>… O painel acha o item, o passo a passo, a ferramenta ou o vídeo." },
+    { alvo: "#unit", sobe: "label", t: "🏥 Sua unidade e o mês", x: "Preencha a unidade e o mês que você está lançando. O progresso do <b>Meu mês</b> fica salvo para essa unidade e esse mês." },
+    { alvo: "#ol-trilha", t: "🗺️ O passo a passo do mês", x: "Os 9 passos, na ordem. <b>Ver como fazer</b> abre as telas explicadas e <b>Feito</b> marca o que já terminou." },
+    { alvo: 'nav button[data-t="conf-mes"]', t: "✅ Conferir tudo de uma vez", x: "Depois de lançar, envie o relatório do APURASUS com o Drive, o SIGA e o SIGSS: o painel mostra o que falta ou está diferente e como corrigir." },
+    { alvo: '[onclick="REPORTAR.abrir()"]', t: "🐞 Algo estranho?", x: "Reporte aqui. A mensagem já vai para a DCFI com a versão do painel, a página, a unidade e o mês." }
+  ];
+  let i = -1, hl = null, bx = null, lista = [];
+  const visivel = el => { if (!el) return false; const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden"; };
+  function alvoDe(p){ let el = document.querySelector(p.alvo); if (el && p.sobe) el = el.closest(p.sobe) || el; return visivel(el) ? el : null; }
+  function montar(){
+    hl = document.createElement("div"); hl.className = "tour-hl"; hl.setAttribute("aria-hidden", "true");
+    bx = document.createElement("div"); bx.className = "tour-bx"; bx.setAttribute("role", "dialog"); bx.setAttribute("aria-live", "polite");
+    document.body.append(hl, bx);
+    window.addEventListener("resize", posicionar); window.addEventListener("scroll", posicionar, true);
+  }
+  function posicionar(){
+    if (i < 0 || !lista[i]) return;
+    const el = alvoDe(lista[i]); if (!el) return;
+    const r = el.getBoundingClientRect(), m = 6;
+    Object.assign(hl.style, { top: (r.top - m) + "px", left: (r.left - m) + "px", width: (r.width + 2*m) + "px", height: (r.height + 2*m) + "px" });
+    const bw = Math.min(360, window.innerWidth - 24), bh = bx.offsetHeight || 170;
+    let top = r.bottom + 14; if (top + bh > window.innerHeight - 8) top = Math.max(8, r.top - bh - 14);
+    let left = Math.min(Math.max(12, r.left), window.innerWidth - bw - 12);
+    if (r.right < 300 && r.left < 300 && window.innerWidth > 700){ left = r.right + 16; top = Math.min(Math.max(8, r.top), window.innerHeight - bh - 8); }
+    Object.assign(bx.style, { top: top + "px", left: left + "px", width: bw + "px" });
+  }
+  function mostrar(){
+    const p = lista[i], el = alvoDe(p); if (!el){ proximo(); return; }
+    el.scrollIntoView({ block: "center", behavior: "smooth" });
+    bx.innerHTML = `<div class="tour-n">${i+1} de ${lista.length}</div><b>${p.t}</b><p>${p.x}</p><div class="tour-ac"><button type="button" class="tour-pular">Pular o tour</button><button type="button" class="tour-prox">${i === lista.length-1 ? "Concluir ✓" : "Próximo ▶"}</button></div>`;
+    bx.querySelector(".tour-pular").onclick = fim; bx.querySelector(".tour-prox").onclick = proximo;
+    setTimeout(posicionar, 30); setTimeout(posicionar, 400);
+    bx.querySelector(".tour-prox").focus({ preventScroll: true });
+  }
+  function proximo(){ i++; if (i >= lista.length) return fim(); mostrar(); }
+  function iniciar(){
+    fim(true);
+    const sec = document.querySelector("main section.on");
+    if (!sec || sec.id !== "busca"){ if (typeof go === "function") go("busca"); }
+    lista = PASSOS.filter(p => alvoDe(p)); if (!lista.length) return;
+    montar(); i = -1; proximo();
+    document.addEventListener("keydown", tecla, true);
+  }
+  function tecla(e){ if (e.key === "Escape") fim(); }
+  function fim(silencioso){
+    try{ localStorage.setItem(CHAVE, "1"); }catch(e){}
+    if (hl) hl.remove(); if (bx) bx.remove(); hl = bx = null; i = -1;
+    window.removeEventListener("resize", posicionar); window.removeEventListener("scroll", posicionar, true);
+    document.removeEventListener("keydown", tecla, true);
+  }
+  function talvez(){ let visto = "1"; try{ visto = localStorage.getItem(CHAVE); }catch(e){} if (!visto) setTimeout(iniciar, 300); }
+  function ativo(){ return !!bx; }
+  return { iniciar, fim, talvez, ativo };
+})();
+(function(){
+  let splashVisivel = false;
+  try{ const sp = document.getElementById("splash-screen"); splashVisivel = sp && sp.style.display !== "none" && !sp.classList.contains("hidden"); }catch(e){}
+  if (!splashVisivel) setTimeout(() => TOUR.talvez(), 1200);
+  const sb = document.getElementById("sb-tour"); if (sb) sb.onclick = () => TOUR.iniciar();
 })();
 
 /* ---------- Aviso quando a internet cai ---------- */

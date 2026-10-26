@@ -36,6 +36,7 @@ Abra o arquivo num editor de texto (Bloco de Notas, Notepad++ ou VS Code) e proc
 | Vídeos do YouTube | `const OL_VIDEOS_LISTA` | Uma linha por vídeo: `id` (o código depois de `youtu.be/`), título, tema e onde ele aparece. |
 | Palavras do dia a dia da busca | `const OL_SINON` | `p` = palavras que a unidade digita; `itens` = nome exato do item de custo; `guias` = passo a passo. |
 | Página "Novidades" | `<div class="nv">` | Acrescente uma linha `nv-item` no topo da lista. |
+| Textos do tour do painel (5 balões) | `const TOUR` | Cada passo tem o alvo (o que fica em destaque), o título e o texto. Para mostrar o tour de novo a todos, troque `apurasus_tour_v1` por `apurasus_tour_v2`. |
 | Endereço do link oficial | `const PAINEL_LINK` | Só mude se o repositório for renomeado. |
 
 ## Depois de mudar à mão
