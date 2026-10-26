@@ -681,6 +681,13 @@ details{border-radius:10px}
 .why div{background:var(--soft);border-radius:10px;padding:14px;font-size:.95rem}.why b{display:block;margin-bottom:4px;color:var(--sus)}
 .sem{display:flex;flex-wrap:wrap;gap:16px;margin:8px 0}.sem span{display:inline-flex;gap:8px;align-items:center}.sem i{width:14px;height:14px;border-radius:50%;display:inline-block}
 footer{background:var(--deep);color:#bcd3c6;border-top:6px solid var(--amber);max-width:none;padding:28px 30px}
+footer .ft-cab{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f2c94c;border:1px solid #f2c94c66;border-radius:999px;padding:4px 12px;margin-bottom:10px}
+footer .ft-cab span{opacity:.6;margin:0 4px}
+footer .ft-sub{margin:0 auto 10px;max-width:640px;font-size:1rem;color:#e6f0ea}
+footer .ft-cred{margin:0 0 10px;color:#e6f0ea}footer .ft-cred b{color:#fff}
+footer .ft-verso{margin:0 auto 16px;max-width:620px;font-style:italic;font-family:Georgia,"Times New Roman",serif;font-size:.95rem;line-height:1.5;color:#cfe0d6;border:0;padding:0}
+footer .ft-mod{margin:0;font-size:.8rem;color:#8fb3a1;border-top:1px solid #ffffff1f;padding-top:12px}
+footer{padding-bottom:84px!important}
 :root.dark footer{background:#050d09}
 
 /* menu lateral */
@@ -1673,6 +1680,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Rodapé</b> — os créditos da equipe, a frase de apresentação e o versículo da tela de abertura agora ficam também no rodapé de todas as páginas.</div></div>
           <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Analisador Produção: checagem da Planilha de Vínculos</b> — antes do resultado, o painel mostra quem tem produção no SIGSS e não está na planilha, nomes repetidos com centros de custo diferentes, linhas sem centro de custo, centros de custo que nenhuma regra reconhece e quem está na planilha mas não apareceu no SIGSS. Botão para <b>baixar a planilha de vínculos com os nomes que faltam</b>.</div></div>
           <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Analisador Folha: “Quem entrou em qual centro de custo”</b> — lista os servidores que ficaram sem centro de custo, com o valor de cada um, e o total por centro de custo.</div></div>
           <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Tour do painel</b> — na primeira visita, 5 balões mostram a busca, a unidade e o mês, o passo a passo, o Conferir meu mês e o botão de reportar problema. Para ver de novo: menu “🧭 Tour do painel”.</div></div>
@@ -2431,7 +2439,11 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
   </main>
 
   <footer>
-    Painel Unificado APURASUS · Módulos de Análise RH, Produção, Estoque, Conferências (Drive, RH, SIGSS Insumos e Conferir meu mês) e Relatório PNGC · Secretaria Municipal de Saúde de Betim (MG)
+    <div class="ft-cab">🏛 Prefeitura de Betim <span>•</span> SMS / DCFI</div>
+    <p class="ft-sub">Sistema Unificado de Apuração e Gestão de Custos. Ferramentas automatizadas e inteligência de dados em um só lugar.</p>
+    <p class="ft-cred">Criado por <b>Daivison, Leonardo, Octavio e Rinaldo</b> · Equipe DCFI</p>
+    <blockquote class="ft-verso">“Não fui eu que ordenei a você? Seja forte e corajoso! Não se apavore nem desanime, pois o Senhor, o seu Deus, estará com você por onde você andar.”</blockquote>
+    <p class="ft-mod">Painel Unificado APURASUS · Módulos de Análise RH, Produção, Estoque, Conferências (Drive, RH, SIGSS Insumos e Conferir meu mês) e Relatório PNGC · Secretaria Municipal de Saúde de Betim (MG) · <span id="ft-ver"></span></p>
   </footer>
 </div>
 
@@ -6728,7 +6740,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 35, data: "26/10/2026" };
+const PAINEL_VERSAO = { n: 36, data: "26/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
@@ -6737,6 +6749,7 @@ const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAIN
 (function(){
   const s = document.getElementById("ver-selo");
   if (s) s.textContent = "Versão " + PAINEL_VERSAO.n + " · " + PAINEL_VERSAO.data;
+  const fv = document.getElementById("ft-ver"); if (fv) fv.textContent = "Versão " + PAINEL_VERSAO.n + " (" + PAINEL_VERSAO.data + ")";
   const b = document.getElementById("btn-baixar-painel");
   if (b) b.hidden = !/^https?:$/.test(location.protocol);
 })();
