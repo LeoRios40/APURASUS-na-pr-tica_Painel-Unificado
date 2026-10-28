@@ -1009,6 +1009,21 @@ main:has(#busca.on) > .qa{display:none}
 .pac-toast.sai{opacity:0}
 .nv-item code{white-space:normal;overflow-wrap:anywhere}.nv-item > div{min-width:0;overflow-wrap:anywhere}
 .bx-geral{margin-top:16px;border-top:2px dashed var(--line);padding-top:12px}.bx-geral h4{margin:0 0 4px}
+.pac-h{margin:14px 0 6px;font-size:15px}
+.pac-ano{border-collapse:collapse;font-size:13px;width:100%;min-width:520px}.pac-ano th,.pac-ano td{border:1px solid var(--line);padding:5px 4px;text-align:center}.pac-ano th[scope=row]{text-align:left;white-space:nowrap;padding-right:8px}
+.pac-ano td.ok{background:rgba(46,125,50,.16);color:#2e7d32}.pac-ano td.fa{background:rgba(179,38,30,.14);color:#c62828;font-weight:700}.pac-ano td.ab{background:var(--path-bg);color:var(--muted)}
+.pac-leg{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:6px 0 4px}
+.pac-lista{list-style:none;padding:0;margin:6px 0;font-size:14px;line-height:1.5}.pac-lista>li{margin:4px 0}.pac-lista ul{margin:2px 0 4px 18px;padding:0}.pac-lista .fa{color:#b3261e}.pac-lista .ok{color:#1e6b34}
+.pac-obr{background:#b3261e;color:#fff;border-radius:6px;padding:0 6px;font-size:12px;font-weight:700}
+.pac-cm{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:2px solid var(--sus);background:var(--soft);border-radius:12px;padding:12px 14px;margin:12px 0}.pac-cm small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.pac-outras{margin-top:8px}.pac-outras summary{cursor:pointer;font-weight:700}
+.cm-pacote{border:2px solid var(--sus);border-radius:12px;background:var(--soft);padding:12px 14px;margin:0 0 14px}
+.cmp-t{font-size:15px;margin-bottom:6px}.cmp-l{list-style:none;padding:0;margin:0}
+.cmp-l li{display:flex;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px dashed var(--line);font-size:14px}.cmp-l li>div{flex:1}.cmp-l li.ok>span{color:#1e6b34}.cmp-l li.fa>span{color:#b3261e}
+.cmp-av{font-size:13.5px;margin-top:6px;color:var(--muted)}.cmp-av.fa{color:#b3261e}
+.cmp-fim{margin-top:10px;font-weight:700;padding:8px 10px;border-radius:9px;background:#fff4e0;color:#8a5a00}.cmp-fim.ok{background:#e3f4e8;color:#1e6b34}
+.dropzone.pac-pisca{outline:3px solid var(--amber);outline-offset:3px;animation:pacPisca 1.6s ease-in-out 3}
+@keyframes pacPisca{50%{outline-color:transparent}}
 .bx-zoom{position:fixed;inset:0;z-index:10050;background:rgba(6,21,15,.88);display:grid;place-items:center;padding:16px;cursor:zoom-out}
 .bx-zoom img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 10px 40px #0008}
 .tour-bx img.tour-img{display:block;width:100%;border-radius:8px;border:1px solid var(--line);margin:8px 0 2px}
@@ -1640,6 +1655,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
           </ul>
         </div>
 
+        <div class="cm-pacote" id="cm-pacote" hidden></div>
         <div class="cm-files">
           <div>
             <div class="step-label"><span class="step-num">1</span> Relatório do APURASUS <span class="cm-obr">obrigatório</span></div>
@@ -1783,7 +1799,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         </div>
         <div class="bx-ext" id="bx-ext-status" hidden></div>
         <div class="bx-usar" id="bx-usar">
-          <div class="bx-usar-t"><b>📦 Já baixou? Use o pacote nas ferramentas</b><small>Arraste aqui a <b>pasta</b> ou o <b>.zip</b> que o Baixador salvou em Downloads › Baixador Betim. O painel separa a Folha, o Estoque e a Produção e manda cada um para a ferramenta que você escolher. Também funciona arrastando direto no quadro de cada Analisador.</small></div>
+          <div class="bx-usar-t"><b>📦 Já baixou? Use o pacote nas ferramentas</b><small>Arraste aqui a <b>pasta</b> ou o <b>.zip</b> que o Baixador salvou em Downloads › Baixador Betim. O painel mostra <b>os meses do ano que vieram e os que faltam</b>, já coloca a Folha e o Estoque no <b>Conferir meu mês</b> e diz o que falta colocar lá (o relatório do APURASUS e o Drive). Também dá para mandar para os Analisadores, ou arrastar direto no quadro de cada um.</small></div>
           <div class="dropzone" id="bx-pac-drop" tabindex="0" role="button">
             <span class="dz-icon">📦</span>
             <span class="dz-text">Arraste a pasta ou o .zip aqui, ou clique para escolher o .zip</span>
@@ -1955,6 +1971,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Pacote do Baixador direto no Conferir meu mês</b> — ao abrir o .zip ou a pasta do Baixador, o painel mostra o ano inteiro: os meses que vieram (✔), os que faltam (✖) e os que ainda não fecharam (⏳), para a Folha, o Estoque e a Produção. A Folha e o Estoque já entram sozinhos no <b>Conferir meu mês</b>, e um quadro no topo da página mostra o que já está e o que falta colocar: o relatório do APURASUS (obrigatório) e a planilha do Drive.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Baixador Betim 2.6.1</b> — com o login geral do RH, a Central volta a <b>seguir o SIGA</b>: sem nenhuma unidade marcada, ela usa a unidade escolhida no SIGA e baixa o Estoque e a Produção dessa mesma unidade. Marcar unidades na lista continua valendo para baixar várias de uma vez.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Baixador Betim 2.6.0: login geral do RH</b> — com o login geral do RH no SIGA, a Central baixa a Folha de <b>várias unidades num lote só</b> e separa cada uma pela lotação (pasta <code class="ol-code">Lote_…</code>). A Central também reconhece nomes abreviados (ex.: “ROGÉRIO G. REZENDE” = “ROGERIO GUSTAVO REZENDE”) e, se não achar a unidade do SIGA no SIGSS, pergunta qual é e guarda a escolha. Veja na aba Baixador Betim, passo 4, e baixe a versão 2.6.0.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Baixador Betim 2.5.0 e o pacote nas ferramentas</b> — <b>no painel:</b> arraste a pasta ou o .zip do Baixador no novo quadro <b>📦 Já baixou?</b> (aba Baixador Betim) ou direto no quadro dos Analisadores e das Conferências: o painel separa a Folha, o Estoque e a Produção e coloca cada arquivo no lugar certo. A aba Baixador Betim mostra qual versão está no seu Chrome e o menu avisa quando há uma nova. A Conferência RH não passa mais da largura da tela no celular. <b>Na extensão:</b> a Central salva numa <b>pasta pronta para abrir</b> (ou em .zip, se preferir), avisa quando o período tem um mês que ainda não fechou, tem o botão <b>Baixar de novo só os que faltaram</b> e a lista <b>Últimos pacotes</b> com o botão Refazer. O tour da aba Baixador Betim mostra tudo isso. Baixe a versão 2.5.0 na aba e copie por cima da pasta antiga.</div></div>
@@ -7029,7 +7046,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 44, data: "28/10/2026" };
+const PAINEL_VERSAO = { n: 45, data: "28/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
@@ -7303,10 +7320,50 @@ const PACOTE = (function(){
   ];
   const PAG_DEST = { "estoque-sigss":"est-a", "analise-sigss":"prod-a", rh:"folha-a", "conf-mes":"cm", "conf-rh":"crh", "conf-sigss":"csg" };
 
+  const MES3 = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  const hojeK = () => { const h = new Date(); return h.getFullYear() * 100 + h.getMonth() + 1; };
+  // "jan–set/2026, nov/2026"
+  function faixas(ks){
+    const l = [...new Set(ks)].sort((a, b) => a - b), out = [];
+    for (let i = 0; i < l.length; i++){
+      let j = i; while (j + 1 < l.length && l[j + 1] === l[j] + 1 && Math.floor(l[j + 1] / 100) === Math.floor(l[i] / 100)) j++;
+      const a = l[i], z = l[j], ano = Math.floor(a / 100);
+      out.push(a === z ? `${MES3[a % 100 - 1]}/${ano}` : `${MES3[a % 100 - 1]}–${MES3[z % 100 - 1]}/${ano}`);
+      i = j;
+    }
+    return out.join(", ");
+  }
+  // o que o pacote tem, o que falta e o que ainda não fechou, ano a ano
+  function cobertura(meus){
+    const anos = [...new Set(meus.map(x => x.ano))].sort();
+    const hoje = hojeK(), r = { anos, tem:{}, falta:{}, aberto:[] };
+    ["folha","est","prod"].forEach(rel => {
+      r.tem[rel] = [...new Set(meus.filter(x => x.rel === rel).map(chaveMes))];
+      r.falta[rel] = [];
+    });
+    const algum = ["folha","est","prod"].filter(rel => r.tem[rel].length);
+    anos.forEach(a => { for (let m = 1; m <= 12; m++){
+      const k = a * 100 + m;
+      if (k >= hoje){ r.aberto.push(k); continue; }
+      algum.forEach(rel => { if (!r.tem[rel].includes(k)) r.falta[rel].push(k); });
+    } });
+    return r;
+  }
+  function gradeAno(c){
+    const lin = (rel, rot) => c.anos.map(a => `<tr><th scope="row">${rot}${c.anos.length > 1 ? ` ${a}` : ""}</th>${MES3.map((_, i) => {
+      const k = a * 100 + i + 1;
+      if (c.tem[rel].includes(k)) return `<td class="ok" title="${MES[i]}/${a}: no pacote">✔</td>`;
+      if (c.aberto.includes(k)) return `<td class="ab" title="${MES[i]}/${a}: ainda não fechou">⏳</td>`;
+      return `<td class="fa" title="${MES[i]}/${a}: falta">✖</td>`;
+    }).join("")}</tr>`).join("");
+    return `<div class="ol-tw"><table class="pac-ano"><tr><th></th>${MES3.map(m => `<th>${m}</th>`).join("")}</tr>${lin("folha","Folha")}${lin("est","Estoque")}${lin("prod","Produção")}</table></div>
+      <div class="pac-leg"><span class="ok">✔ no pacote</span><span class="fa">✖ falta</span><span class="ab">⏳ ainda não fechou</span></div>`;
+  }
+
+  let atual = null; // o pacote que está no Conferir meu mês
   function desenhar(){
     const unis = [...new Set(itens.map(x => x.uni))].sort();
     const html = `<h3>📦 Pacote do Baixador Betim</h3>
-      <p class="pac-sub">${itens.length} planilha(s) encontrada(s). Escolha para qual ferramenta mandar: o painel coloca os arquivos no lugar certo e abre a página.</p>
       ${unis.length > 1 ? `<label class="pac-uni">🏥 Unidade <select id="pac-uni">${unis.map(u => `<option>${esc(u)}</option>`).join("")}</select></label>` : `<div class="pac-uni">🏥 <b>${esc(unis[0])}</b></div>`}
       <div id="pac-corpo"></div>`;
     janela(html);
@@ -7318,20 +7375,86 @@ const PACOTE = (function(){
     const sel = caixa.querySelector("#pac-uni");
     const uni = sel ? sel.value : itens[0].uni;
     const meus = itens.filter(x => x.uni === uni);
-    const meses = [...new Set(meus.map(chaveMes))].sort((a, b) => a - b);
-    const tem = (rel, k) => meus.some(x => x.rel === rel && chaveMes(x) === k);
-    const grade = `<div class="ol-tw"><table class="ol-t pac-grade"><tr><th>Mês</th><th>Folha</th><th>Estoque</th><th>Produção</th></tr>${meses.map(k => `<tr><td>${rotMes(k)}</td>${["folha","est","prod"].map(r => `<td>${tem(r, k) ? "✔" : "–"}</td>`).join("")}</tr>`).join("")}</table></div>`;
+    const c = cobertura(meus);
+    // distribuição automática: Folha e Estoque já vão para o Conferir meu mês
+    const ord = (a, b) => chaveMes(a) - chaveMes(b);
+    const fF = meus.filter(x => x.rel === "folha").sort(ord), fE = meus.filter(x => x.rel === "est").sort(ord);
+    if (fF.length) colocar("cm-file-siga", fF.map(x => x.file));
+    if (fE.length) colocar("cm-file-sigss", fE.map(x => x.file));
+    atual = { uni, c, nF: fF.length, nE: fE.length, nP: c.tem.prod.length };
+    painelConf();
+    const faltas = ["folha","est","prod"].filter(r => c.tem[r].length && c.falta[r].length).map(r => `<li><b>${REL[r]}:</b> ${faixas(c.falta[r])}</li>`).join("");
+    const semRel = ["folha","est","prod"].filter(r => !c.tem[r].length).map(r => REL[r]);
+    const abertos = c.aberto.length ? `<li>⏳ <b>${faixas(c.aberto)}</b> ainda não ${c.aberto.length > 1 ? "fecharam" : "fechou"}: baixe com o Baixador depois que o mês terminar.</li>` : "";
     const cartoes = DEST.map(d => {
       const rels = d.rel.split("+");
       const ms = [...new Set(meus.filter(x => rels.includes(x.rel)).map(chaveMes))].sort((a, b) => a - b);
       const vazio = !ms.length;
       const escolha = d.todos ? `<span class="pac-q">${ms.length} mês(es)</span>` : `<select data-mes="${d.id}" ${vazio ? "disabled" : ""}>${ms.map(k => `<option value="${k}">${rotMes(k)}</option>`).join("")}</select>`;
-      const marcado = destinoPedido && PAG_DEST[destinoPedido] === d.id;
+      const marcado = destinoPedido && PAG_DEST[destinoPedido] === d.id && d.id !== "cm";
       return `<div class="pac-d${marcado ? " pedido" : ""}${vazio ? " vazio" : ""}"><div class="pac-dt">${d.ic} <b>${d.t}</b>${marcado ? ' <span class="pac-aqui">você estava aqui</span>' : ""}</div><small>${vazio ? `Este pacote não tem ${rels.map(r => REL[r]).join(" nem ")}.` : d.d}</small><div class="pac-da">${escolha}<button type="button" class="btn btn-primary" data-dest="${d.id}" ${vazio ? "disabled" : ""}>Mandar ➜</button></div></div>`;
     }).join("");
-    caixa.querySelector("#pac-corpo").innerHTML = `${grade}<div class="pac-ds">${cartoes}</div><p class="pac-pe">🔒 As planilhas são lidas aqui mesmo, no navegador: nada sai do seu computador.</p>`;
+    const outrasAbertas = destinoPedido && PAG_DEST[destinoPedido] && destinoPedido !== "conf-mes";
+    caixa.querySelector("#pac-corpo").innerHTML = `
+      <h4 class="pac-h">📅 O que veio no pacote</h4>
+      ${gradeAno(c)}
+      <ul class="pac-lista">
+        ${faltas ? `<li class="fa">✖ <b>Faltam no pacote</b><ul>${faltas}</ul>Baixe esses meses com o Baixador (ou use <b>🔁 Refazer</b> em Últimos pacotes).</li>` : `<li class="ok">✔ Nenhum mês fechado faltando${semRel.length ? "" : " na Folha, no Estoque e na Produção"}.</li>`}
+        ${semRel.length ? `<li class="fa">✖ O pacote não tem <b>${semRel.join(" nem ")}</b>.</li>` : ""}
+        ${abertos}
+      </ul>
+      <h4 class="pac-h">📂 Fora do pacote: você coloca no Conferir meu mês</h4>
+      <ul class="pac-lista">
+        <li class="fa">⬜ <b>Relatório do APURASUS</b> (Custo Total da Unidade) · <span class="pac-obr">obrigatório</span> · quadro 1</li>
+        <li>⬜ <b>Planilha do Drive</b> da unidade · opcional · quadro 2</li>
+      </ul>
+      <div class="pac-cm">
+        <div><b>✅ Já coloquei no Conferir meu mês</b><small>${fF.length ? `Folha: ${fF.length} mês(es) no quadro 3` : "Sem Folha"} · ${fE.length ? `Estoque: ${fE.length} mês(es) no quadro 4` : "sem Estoque"}. Agora é só colocar o relatório do APURASUS e, se tiver, a planilha do Drive.</small></div>
+        <button type="button" class="btn btn-primary" id="pac-ir-cm">Continuar no Conferir meu mês ➜</button>
+      </div>
+      <details class="pac-outras"${outrasAbertas ? " open" : ""}><summary>Mandar para outra ferramenta (Analisadores e Conferências)</summary><div class="pac-ds">${cartoes}</div></details>
+      <p class="pac-pe">🔒 As planilhas são lidas aqui mesmo, no navegador: nada sai do seu computador.</p>`;
     caixa.querySelectorAll("[data-dest]").forEach(b => b.addEventListener("click", () => mandar(b.dataset.dest, meus)));
+    caixa.querySelector("#pac-ir-cm").addEventListener("click", irConf);
   }
+  function irConf(){
+    fechar(); go("conf-mes");
+    setTimeout(() => { const p = document.getElementById("cm-pacote"); if (p) p.scrollIntoView({ behavior:"smooth", block:"start" }); }, 350);
+  }
+  // quadro no topo do Conferir meu mês: o que já está e o que falta colocar
+  function painelConf(){
+    const box = document.getElementById("cm-pacote"); if (!box) return;
+    if (!atual){ box.hidden = true; return; }
+    const n = id => { const i = document.getElementById(id); return i && i.files ? i.files.length : 0; };
+    const a = n("cm-file-apura"), dr = n("cm-file-drive"), sg = n("cm-file-siga"), ss = n("cm-file-sigss");
+    if (!sg && !ss){ atual = null; box.hidden = true; return; }
+    const c = atual.c;
+    const it = (ok, txt, alvo, opc) => `<li class="${ok ? "ok" : opc ? "op" : "fa"}"><span>${ok ? "✔" : "⬜"}</span><div>${txt}</div>${!ok && alvo ? `<button type="button" class="ol-lnk" data-cm-ir="${alvo}">colocar ➜</button>` : ""}</li>`;
+    const faltam = ["folha","est"].filter(r => c.falta[r].length).map(r => `${REL[r]}: ${faixas(c.falta[r])}`);
+    box.hidden = false;
+    box.innerHTML = `<div class="cmp-t">📦 Pacote do Baixador · <b>${esc(atual.uni)}</b></div>
+      <ul class="cmp-l">
+        ${it(a, "<b>1. Relatório do APURASUS</b> (Custo Total da Unidade) · obrigatório", "cm-drop-apura")}
+        ${it(dr, "<b>2. Planilha do Drive</b> · opcional: liga a Conferência Drive", "cm-drop-drive", true)}
+        ${it(sg, `<b>3. Folha do SIGA</b> · ${sg} mês(es)${atual.nF ? ` (${faixas(c.tem.folha)})` : ""} · do pacote`, "cm-drop-siga")}
+        ${it(ss, `<b>4. Estoque do SIGSS</b> · ${ss} mês(es)${atual.nE ? ` (${faixas(c.tem.est)})` : ""} · do pacote`, "cm-drop-sigss")}
+      </ul>
+      ${faltam.length ? `<div class="cmp-av fa">✖ Faltam no pacote: ${faltam.join(" · ")}</div>` : ""}
+      ${c.aberto.length ? `<div class="cmp-av">⏳ ${faixas(c.aberto)} ainda não ${c.aberto.length > 1 ? "fecharam" : "fechou"}.</div>` : ""}
+      ${atual.nP ? `<div class="cmp-av">📊 A Produção (${faixas(c.tem.prod)}) não entra aqui: use o <button type="button" class="ol-lnk" data-go="analise-sigss">Analisador Produção</button>, um mês por vez.</div>` : ""}
+      <div class="cmp-fim ${a ? "ok" : ""}">${a ? `✅ Tudo pronto para conferir. <button type="button" class="ol-lnk" data-cm-ir="cm-run-btn">Ir para “Conferir tudo” ➜</button>` : "👉 Falta o <b>relatório do APURASUS</b> no quadro 1."}</div>`;
+    box.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+    document.querySelectorAll(".dropzone.pac-pisca").forEach(z => z.classList.remove("pac-pisca"));
+    if (!a){ const z = document.getElementById("cm-drop-apura"); if (z) z.classList.add("pac-pisca"); }
+  }
+  document.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest("[data-cm-ir]"); if (!b) return;
+    const z = document.getElementById(b.dataset.cmIr); if (!z) return;
+    z.scrollIntoView({ behavior:"smooth", block:"center" });
+    if (z.classList.contains("dropzone")) setTimeout(() => z.click(), 450);
+  });
+  ["cm-file-apura","cm-file-drive","cm-file-siga","cm-file-sigss"].forEach(id => { const i = document.getElementById(id); if (i) i.addEventListener("change", () => setTimeout(painelConf, 0)); });
+
   function colocar(inpId, arquivos){
     const inp = document.getElementById(inpId); if (!inp) return false;
     const dt = new DataTransfer(); arquivos.forEach(f => dt.items.add(f));
@@ -7494,6 +7617,7 @@ const TOUR = (function(){
       { alvos:[H("#cf-run-btn")], t:"▶️ Conferir", x:"Mostra o que tem valor no Drive e não foi lançado, e gera a planilha da conferência." }
     ],
     "conf-mes": [
+      { alvos:[H("#cm-pacote")], t:"📦 O pacote do Baixador", x:"Quando você abre um pacote do Baixador, a Folha e o Estoque já entram nos quadros 3 e 4. Este quadro mostra o que já está, o que falta no pacote e o que falta colocar: o relatório do APURASUS e o Drive." },
       { alvos:[H("#cm-drop-apura")], t:"1️⃣ O relatório do APURASUS", x:"Obrigatório. Os outros arquivos são opcionais: cada um liga uma conferência." },
       { alvos:[H("#cm-drop-drive")], t:"2️⃣ Drive", x:"Confere os itens que vêm das planilhas do Drive." },
       { alvos:[H("#cm-drop-siga")], t:"3️⃣ SIGA", x:"Confere remunerações, benefícios e hora extra, com as alíquotas." },
@@ -7516,7 +7640,7 @@ const TOUR = (function(){
     baixador: [
       { alvos:[H("#bx-oque")], t:"⬇️ O que é o Baixador Betim", x:"Uma extensão do Chrome que tira a Folha (SIGA), o Estoque e a Produção (SIGSS) de <b>vários meses de uma vez</b>. Vamos ver o passo a passo com as telas." },
       { alvos:[H("#bx-ext-status")], t:"🔎 Qual versão está no seu Chrome", x:"Aqui o painel mostra a versão do Baixador instalada neste Chrome (a partir da 2.5.0) e avisa quando há uma mais nova. No menu, aparece <b>atualizar</b> ao lado de Baixador Betim." },
-      { alvos:[H("#bx-usar")], t:"📦 Já baixou? Arraste aqui", x:"Arraste a <b>pasta</b> ou o <b>.zip</b> do Baixador neste quadro. O painel separa a Folha, o Estoque e a Produção e manda cada um para a ferramenta que você escolher, já colocado no lugar certo." },
+      { alvos:[H("#bx-usar")], t:"📦 Já baixou? Arraste aqui", x:"Arraste a <b>pasta</b> ou o <b>.zip</b> do Baixador neste quadro. O painel mostra os meses do ano que vieram, os que faltam e os que ainda não fecharam, e já coloca a Folha e o Estoque no <b>Conferir meu mês</b>. Lá, falta só o relatório do APURASUS e o Drive." },
       { alvos:[H("#bx-baixar")], t:"📦 1. Baixe a extensão", x:"Clique em <b>Baixar a extensão</b> e <b>extraia</b> o .zip numa pasta fixa (ex.: Documentos). Não apague essa pasta depois." },
       { abre:"#bx-p1", alvos:[H("#bx-f-icone")], t:"🧩 2. Abra as extensões", x:"Clique na <b>peça de quebra-cabeça</b>, ao lado da barra de endereço, ou digite <b>chrome://extensions</b> na barra." },
       { abre:"#bx-p1", alvos:[H("#bx-f-ext")], t:"⚙️ 3. Instale", x:"<b>A</b> ligue o Modo do desenvolvedor · <b>B</b> Carregar sem compactação e escolha a pasta <b>baixador-betim</b> · <b>C</b> aparece o cartão da extensão · <b>D</b> em <b>Saiba mais</b>, ligue <b>Permitir no modo anônimo</b> · <b>E</b> a chave fica ligada." },
