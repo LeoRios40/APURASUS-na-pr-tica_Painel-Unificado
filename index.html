@@ -745,6 +745,20 @@ footer .ft-topo:hover,footer .ft-topo:focus{background:#f2c94c;color:#10261c;out
 .tour-ac{display:flex;justify-content:space-between;gap:8px}
 .tour-ac button{font:inherit;font-weight:800;border-radius:10px;padding:8px 14px;cursor:pointer;border:2px solid var(--ink);background:var(--card);color:var(--ink)}
 .tour-ac .tour-prox{background:var(--sus);color:#fff}
+.tour-bx .tq{display:block;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--sus);margin:8px 0 1px}
+.tour-bx .tq:first-child{margin-top:2px}
+nav button.tour-nav-on{position:relative;z-index:9999;outline:3px solid var(--amber);outline-offset:-3px;background:var(--amber)!important;color:#1a1200!important;border-radius:10px}
+.tour-fundo{inset:0;width:auto;height:auto;border-radius:0;box-shadow:none;background:rgba(6,21,15,.6)}
+.tour-menu{top:50%;left:50%;transform:translate(-50%,-50%);width:min(460px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}
+.tour-ops{display:grid;gap:8px;margin:4px 0 12px}
+.tour-ops button{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;border:2px solid var(--ink);background:var(--path-bg);color:var(--ink);border-radius:12px;padding:10px 12px;cursor:pointer}
+.tour-ops button:hover,.tour-ops button:focus{background:var(--amber);color:#1a1200;outline:none}
+.tour-ops b{display:block}.tour-ops small{display:block;font-size:.82rem;opacity:.85;margin-top:2px}
+.tour-oi{font-size:1.4rem;line-height:1}
+.tour-sub{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sus);margin:0 0 6px}
+.tour-grp{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tour-grp button{font:inherit;font-size:.85rem;font-weight:700;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+.tour-grp button:hover,.tour-grp button:focus{background:var(--amber);color:#1a1200;outline:none}
 @media (prefers-reduced-motion:reduce){.tour-hl{transition:none}}
 @media print{.tour-hl,.tour-bx{display:none!important}}
 .vinc-box{border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--card)}
@@ -1006,7 +1020,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
   <button type="button" class="sb-search" id="sb-search" title="Atalho: tecla /">
     <span class="icon">🔎</span> <span class="text">Buscar no painel</span>
   </button>
-  <button type="button" class="sb-search sb-tour" id="sb-tour" title="Passeio por todo o painel: busca, menu, ferramentas, conferências e ajuda">
+  <button type="button" class="sb-search sb-tour" id="sb-tour" title="Tour do painel: visão rápida ou conhecer cada aba, por grupo do menu">
     <span class="icon">🧭</span> <span class="text">Tour do painel</span>
   </button>
   <div class="sb-group" id="sbg-comece">Comece aqui</div>
@@ -1828,6 +1842,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Tour “Conhecer cada aba”</b> — o <b>🧭 Tour do painel</b> agora abre uma escolha: <b>Conhecer cada aba</b> abre cada página, uma por uma, e explica em poucas linhas <b>para que serve</b>, <b>o que você precisa</b> e <b>o que ela entrega</b>; dá para fazer o tour de um grupo só (Comece aqui, Ferramentas automáticas, Conferir, Gestão, Guias ou Ajuda). A <b>Visão rápida</b> de 1 minuto continua lá. O Baixador Betim entrou nos tours.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Nova página: ⬇️ Baixador Betim</b> — extensão do Google Chrome que tira a <b>Folha (SIGA)</b>, o <b>Estoque</b> e a <b>Produção (SIGSS)</b> de vários meses de uma vez e, no SIGSS, de várias unidades. A <b>Central de Relatórios</b> entrega um pacote .zip por unidade. A página tem o arquivo para baixar, a instalação passo a passo, o uso e as soluções para os problemas mais comuns. Atalho: <b>Alt+9</b>.</div></div>
           <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Tour completo e tour de cada página</b> — o tour do painel agora passa por todo o menu (Comece aqui, Ferramentas, Conferências, Gestão, Guias e Ajuda), a busca, a unidade e o mês, letra e modo escuro, reportar problema, ajuda e voltar ao topo. Cada página ganhou o botão <b>🧭 Tour desta página</b>. Dá para voltar um balão (◀) e usar as setas do teclado.</div></div>
           <div class="nv-item"><span class="nv-data">26/10/2026</span><div><b>Voltar ao topo</b> — botão no fim de cada página e botão redondo <b>⬆</b> que aparece no canto da tela quando você desce.</div></div>
@@ -2570,7 +2585,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
       <details><summary>“O somatório dos valores informados é diferente do valor total”</summary><div>O que você distribuiu entre os centros não fecha com o valor do item. Ajuste até o “valor restante” ficar verde e zerado.</div></details>
       <details><summary>Como sei se os valores de RH (folha) foram lançados certo?</summary><div>Use a <button class="ol-lnk" data-go="conf-rh">🧾 Conferência RH</button>: envie o relatório Custo Total da Unidade e as planilhas do SIGA. Ela soma provisão e encargos e mostra o que está menor, maior ou não lançado.</div></details>
       <details><summary>Como sei se os insumos do SIGSS foram lançados certo?</summary><div>Use a <button class="ol-lnk" data-go="conf-sigss">💊 Conferência SIGSS Insumos</button>: envie o relatório Custo Total da Unidade e o Estoque por unidade do SIGSS em Excel (e a planilha do Drive para Limpeza e Odontológico). Ela mostra o que está menor, maior ou não lançado e qual bloco do relatório ficou de fora.</div></details>
-      <details><summary>Quero ver de novo o tour do painel</summary><div>O <b>tour do painel</b> passa pela busca, a unidade e o mês, o passo a passo, cada grupo do menu, letra e modo escuro, reportar problema, ajuda e voltar ao topo. Cada página também tem o botão <b>🧭 Tour desta página</b>, no canto do primeiro quadro, que explica só aquela tela. <button class="ol-lnk" type="button" onclick="TOUR.iniciar()">🧭 Ver o tour do painel agora</button></div></details>
+      <details><summary>Quero ver de novo o tour do painel</summary><div>O <b>Tour do painel</b>, no menu, tem duas opções: <b>Conhecer cada aba</b> (abre cada página e explica para que serve, o que você precisa e o que ela entrega; dá para fazer só um grupo, como as Ferramentas automáticas) e a <b>Visão rápida</b> (1 minuto pela busca, o menu e os botões do topo). Cada página também tem o botão <b>🧭 Tour desta página</b>, no canto do primeiro quadro, que explica cada parte daquela tela. <button class="ol-lnk" type="button" onclick="TOUR.escolher()">🧭 Abrir o tour do painel agora</button></div></details>
       <details><summary>Quero ver de novo a tela de abertura</summary><div>Ela aparece só na primeira visita. <button class="ol-lnk" type="button" onclick="try{localStorage.removeItem('apurasus_visto')}catch(e){};location.reload()">Mostrar a tela de abertura de novo</button></div></details>
       <details><summary>Onde vejo custo, produção e custo unitário de todas as unidades?</summary><div>No <button class="ol-lnk" data-go="pngc">📈 Relatório PNGC</button> (Gestão e indicadores). Ele usa as bases de custo e de produção do APURASUS, confere a qualidade dos lançamentos, compara as unidades e gera o relatório mensal de cada uma em PDF.</div></details>
       <details><summary>Como sei se lancei tudo o que está no Drive?</summary><div>Use a <button class="ol-lnk" data-go="conf-drive">🔄 Conferência Drive</button>: envie o relatório Custo Total da Unidade e a planilha da unidade do Drive.</div></details>
@@ -3868,7 +3883,7 @@ $("#rs").onclick=()=>{if(confirm("Reiniciar as etapas e os itens deste mês?")){
 
 /* NAVEGAÇÃO DE ABAS UNIFICADA */
 function go(t){
-  if (typeof TOUR !== "undefined" && TOUR.ativo()) TOUR.fim();
+  if (typeof TOUR !== "undefined" && TOUR.ativo() && !window.__tourNav) TOUR.fim();   // o próprio tour pode trocar de página sem se fechar
   document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x.dataset.t===t));
   document.querySelectorAll("main section").forEach(s=>s.classList.toggle("on",s.id===t));
   window.scrollTo({top:0,behavior:"smooth"});
@@ -6896,7 +6911,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 38, data: "28/10/2026" };
+const PAINEL_VERSAO = { n: 39, data: "28/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
@@ -7055,7 +7070,8 @@ const TOUR = (function(){
     { alvos:[{ s:"#font-down" },{ s:"#font-up" },{ s:"#btn-theme" }], t:"🔠 Letra e modo escuro", x:"<b>A−</b> e <b>A+</b> diminuem e aumentam a letra. <b>Modo escuro</b> deixa a tela escura, melhor para a vista à noite." },
     { alvos:[{ s:'.header-tools [onclick="REPORTAR.abrir()"]' },{ s:"#ver-selo" }], t:"🐞 Reportar e versão", x:"Algo estranho? <b>Reportar um problema</b> abre a mensagem para a DCFI já com a versão, a página, a unidade e o mês. O selo da <b>versão</b> leva às novidades." },
     { alvos:[{ s:".ol-help" }], t:"🙋 Precisa de ajuda?", x:"Este botão fica sempre no canto da tela e abre as soluções de erros e dúvidas frequentes, com o contato da DCFI." },
-    { alvos:[{ s:"#ft-topo" }], t:"⬆️ Voltar ao topo", x:"No fim de cada página há o botão <b>Voltar ao topo</b>. E, quando você desce a página, aparece o botão redondo <b>⬆</b> no canto da tela. Pronto: agora é só usar! 😉" }
+    { alvos:[{ s:"#ft-topo" }], t:"⬆️ Voltar ao topo", x:"No fim de cada página há o botão <b>Voltar ao topo</b>. E, quando você desce a página, aparece o botão redondo <b>⬆</b> no canto da tela." },
+    { alvos:[{ s:"#sb-tour" }], soPc:true, t:"📚 Quer conhecer cada aba?", x:"Em <b>Tour do painel</b>, escolha <b>Conhecer cada aba</b>: o tour abre cada página e explica para que serve, o que você precisa e o que ela entrega. Dá para fazer só um grupo, como as Ferramentas automáticas." }
   ];
   const H = (s, txt, sobe) => ({ s, txt, sobe });
   const PAGINAS = {
@@ -7161,6 +7177,96 @@ const TOUR = (function(){
       { alvos:[H("#novidades .nv")], t:"🆕 Novidades", x:"O que mudou em cada versão, do mais recente para o mais antigo. As linhas com borda são mudanças de <b>regra</b>." }
     ]
   };
+  /* ===== Tour "Conhecer cada aba": abre cada página e explica para que serve, o que precisa e o que entrega ===== */
+  const Q = (rot, txt) => `<span class="tq">${rot}</span>${txt}`;
+  const ABA = (pg, g, t, ...linhas) => ({ pg, g, alvos:[{ s:"#"+pg+" h2" }], t, x: linhas.join("") });
+  const GRUPO = (id, g, sb, primeiro, ultimo, t, x) => ({ g, soPc:true, alvos:[{ s:"#"+sb },{ s:`nav button[data-t="${primeiro}"]` },{ s:`nav button[data-t="${ultimo}"]` }], t, x });
+  const GRUPOS = [
+    { id:"comece", ic:"📌", nome:"Comece aqui", passos:[
+      GRUPO("comece","Comece aqui","sbg-comece","busca","mes","📌 Comece aqui","Duas páginas para o dia a dia: a <b>página inicial</b>, onde você descobre onde lançar cada coisa, e o <b>Meu mês</b>, a sua lista do mês."),
+      ABA("busca","Comece aqui","🔍 Onde lanço? (início)",
+        Q("Para quê","A página de partida: a busca do item, os 9 passos do mês e de onde vem cada valor (Drive, SIGA, SIGSS)."),
+        Q("Quando usar","Sempre que for lançar ou não souber onde fica um valor."),
+        Q("Dica","Escreva do seu jeito na busca: <i>conta de luz</i>, <i>salário</i>, <i>relato do mês</i>.")),
+      ABA("mes","Comece aqui","🗓️ Meu mês",
+        Q("Para quê","A sua lista do mês: os passos feitos e os itens já lançados, com o semáforo."),
+        Q("Quando usar","Durante o mês, para não esquecer nada."),
+        Q("Dica","O progresso fica salvo neste computador, por unidade e mês. Dá para imprimir o checklist e levar para outro computador."))
+    ]},
+    { id:"ferr", ic:"⚙️", nome:"Ferramentas automáticas", passos:[
+      GRUPO("ferr","Ferramentas automáticas","sbg-ferr","rh","baixador","⚙️ Ferramentas automáticas","Você coloca o arquivo bruto e recebe os valores <b>prontos para lançar</b>. Vamos abrir cada uma."),
+      ABA("rh","Ferramentas automáticas","🧾 Analisador Folha",
+        Q("Para quê","Transforma a planilha do SIGA no resumo por centro de custo, pronto para lançar o RH."),
+        Q("Você precisa","A planilha <b>Apura SUS Folha por Unidade</b> do mês e a planilha de referência (servidor × centro de custo)."),
+        Q("Você recebe","Uma planilha com os valores de cada centro de custo e quem ficou sem centro de custo.")),
+      ABA("analise-sigss","Ferramentas automáticas","📊 Analisador Produção",
+        Q("Para quê","Organiza a produção dos profissionais e aplica as regras do APURASUS (Sala de Procedimentos, centros finais, Gerência, Residentes)."),
+        Q("Você precisa","O relatório <b>Itens de produção</b> do SIGSS e a <b>Planilha de Vínculos</b> da unidade."),
+        Q("Você recebe","O Relatório Didático: o que lançar em cada centro de custo, com os alertas.")),
+      ABA("estoque-sigss","Ferramentas automáticas","📦 Analisador Estoque",
+        Q("Para quê","Separa os insumos entre Farmácia, Sala de Procedimentos, Gerência e Odonto, já somados."),
+        Q("Você precisa","O <b>Estoque por unidade</b> do SIGSS em Excel (um ou vários meses)."),
+        Q("Você recebe","A tabela de onde lançar cada item e a métrica de produção da Farmácia.")),
+      ABA("baixador","Ferramentas automáticas","⬇️ Baixador Betim",
+        Q("Para quê","Extensão do Chrome que tira a Folha (SIGA), o Estoque e a Produção (SIGSS) de <b>vários meses de uma vez</b>."),
+        Q("Como começar","Baixe nesta página e siga o Passo 1 (instalar é uma vez só)."),
+        Q("Você recebe","Os arquivos prontos para as três ferramentas acima, num pacote por unidade."))
+    ]},
+    { id:"conf", ic:"✅", nome:"Conferir o que foi lançado", passos:[
+      GRUPO("conf","Conferir o que foi lançado","sbg-conf","conf-mes","conf-sigss","✅ Conferir o que foi lançado","Depois de lançar, confira. Todas usam o mesmo relatório do APURASUS: o <b>Custo Total da Unidade</b>."),
+      ABA("conf-mes","Conferir o que foi lançado","✅ Conferir meu mês",
+        Q("Para quê","Faz as três conferências de uma vez e devolve <b>uma lista única de pendências</b>."),
+        Q("Você precisa","O Custo Total da Unidade (obrigatório) e o que tiver do Drive, do SIGA e do SIGSS."),
+        Q("Dica","É o caminho mais rápido para fechar o mês.")),
+      ABA("conferencia","Conferir o que foi lançado","🔎 Conferência dos lançamentos",
+        Q("Para quê","Mostra qual conferência cobre cada fonte e um roteiro para conferir o mês."),
+        Q("Quando usar","Quando quiser entender qual ferramenta usar em cada caso.")),
+      ABA("conf-drive","Conferir o que foi lançado","🔄 Conferência Drive",
+        Q("Para quê","Compara o APURASUS com a planilha da unidade no Drive: luz, água, aluguel, terceirizados…"),
+        Q("Você precisa","O Custo Total da Unidade e a planilha do Drive em Excel."),
+        Q("Você recebe","O que tem valor no Drive e não foi lançado, numa planilha com cores.")),
+      ABA("conf-rh","Conferir o que foi lançado","🧾 Conferência RH",
+        Q("Para quê","Confere os 7 itens de pessoal com a folha do SIGA, já somando provisão e encargos."),
+        Q("Você precisa","O Custo Total da Unidade e a planilha do SIGA de cada mês."),
+        Q("Você recebe","Mês a mês: correto, lançado a menos, a mais ou não lançado.")),
+      ABA("conf-sigss","Conferir o que foi lançado","💊 Conferência SIGSS Insumos",
+        Q("Para quê","Confere medicamentos, materiais e fórmulas com o Estoque do SIGSS, somando todos os blocos do relatório."),
+        Q("Você precisa","O Custo Total da Unidade, o Estoque por unidade em Excel e, para Limpeza e Odontológico, a planilha do Drive."),
+        Q("Você recebe","As pendências mês a mês e a divisão entre Farmácia e Sala de Procedimentos."))
+    ]},
+    { id:"gest", ic:"📈", nome:"Gestão e indicadores", passos:[
+      ABA("pngc","Gestão e indicadores","📈 Relatório PNGC",
+        Q("Para quê","Ferramenta da DCFI para acompanhar <b>todas as unidades</b> com as bases do Ministério da Saúde."),
+        Q("Você precisa","As bases de custo e de produção do APURASUS."),
+        Q("Você recebe","A situação de cada unidade (Pendente, Atenção, Em dia), a qualidade dos lançamentos e o relatório mensal em PDF."))
+    ]},
+    { id:"guias", ic:"📚", nome:"Guias de consulta", passos:[
+      GRUPO("guias","Guias de consulta","sbg-guias","prod","videos","📚 Guias de consulta","Explicações completas, com as telas do sistema, para consultar quando surgir dúvida."),
+      ABA("prod","Guias de consulta","📋 Guia Produção",
+        Q("Para quê","Como lançar a produção de cada centro de custo: administrativos, intermediários e finais."),
+        Q("Dica","Toque no nome de cada centro de custo para abrir o passo a passo.")),
+      ABA("sigss","Guias de consulta","💊 Guia Insumos",
+        Q("Para quê","Como o relatório Estoque por unidade é organizado e como lançar cada bloco no APURASUS."),
+        Q("Também tem","O guia da folha de pagamento do SIGA.")),
+      ABA("videos","Guias de consulta","🎬 Vídeos",
+        Q("Para quê","As aulas do canal, na ordem do mês, com filtro por assunto."),
+        Q("Dica","Os vídeos também aparecem dentro de cada passo a passo."))
+    ]},
+    { id:"ajuda", ic:"🙋", nome:"Ajuda", passos:[
+      GRUPO("ajuda","Ajuda","sbg-ajuda","duv","novidades","🙋 Ajuda","Soluções para os erros comuns, as regras que o painel usa e o que mudou em cada versão."),
+      ABA("duv","Ajuda","❓ Ajuda & Erros",
+        Q("Para quê","Erros comuns do APURASUS e como resolver, com o contato da DCFI.")),
+      ABA("regras","Ajuda","📏 Regras e alíquotas",
+        Q("Para quê","A tabela central do painel: alíquotas (encargos e provisão), regras da produção e onde lançar cada item."),
+        Q("Bom saber","Quando uma regra muda, ela muda aqui e vale para todas as ferramentas.")),
+      ABA("novidades","Ajuda","🆕 Novidades",
+        Q("Para quê","O que mudou em cada versão do painel."),
+        Q("Dica","O selo da versão, no topo, também abre esta página."))
+    ]}
+  ];
+  const FIM_ABAS = { g:"Pronto", alvos:[{ s:"#sb-tour" }], t:"🎉 Você conheceu o painel", x:"Para rever um grupo, use <b>Tour do painel</b> e escolha o grupo. Cada página também tem o botão <b>🧭 Tour desta página</b>, que explica cada parte daquela tela." };
+  const FIM_ABAS_CEL = { g:"Pronto", alvos:[{ s:"nav.sidebar" }], t:"🎉 Você conheceu o painel", x:"Para rever, use <b>Tour do painel</b> (na busca do painel ou em Ajuda & Erros). Cada página também tem o botão <b>🧭 Tour desta página</b>." };
+
   const FECHO = { alvos:[{ s:"#ft-topo" }], t:"⬆️ Voltar ao topo", x:"No fim da página fica o botão <b>Voltar ao topo</b>; ao descer, aparece também o botão redondo <b>⬆</b> no canto da tela." };
 
   let i = -1, hl = null, bx = null, lista = [];
@@ -7173,7 +7279,11 @@ const TOUR = (function(){
     return visivel(el) ? el : null;
   }
   const elsDe = p => p.alvos.map(acha).filter(Boolean);
-  const valePasso = p => !(p.soPc && celular()) && !(p.soCel && !celular()) && elsDe(p).length;
+  const valePasso = p => !(p.soPc && celular()) && !(p.soCel && !celular()) && (p.pg ? true : elsDe(p).length);
+  function marcaMenu(pg){
+    document.querySelectorAll("nav button.tour-nav-on").forEach(b => b.classList.remove("tour-nav-on"));
+    if (pg){ const b = document.querySelector(`nav button[data-t="${pg}"]`); if (b){ b.classList.add("tour-nav-on"); b.scrollIntoView({ block:"nearest", inline:"nearest" }); } }
+  }
   function caixa(els){
     const rs = els.map(e => e.getBoundingClientRect());
     return { top: Math.min(...rs.map(r => r.top)), left: Math.min(...rs.map(r => r.left)), right: Math.max(...rs.map(r => r.right)), bottom: Math.max(...rs.map(r => r.bottom)) };
@@ -7198,14 +7308,21 @@ const TOUR = (function(){
     Object.assign(bx.style, { top: Math.max(8, top) + "px", left: left + "px", width: bw + "px" });
   }
   function mostrar(){
-    const p = lista[i], els = elsDe(p); if (!els.length){ proximo(); return; }
+    const p = lista[i];
+    if (p.pg && typeof go === "function"){
+      const sec = document.querySelector("main section.on");
+      if ((!sec || sec.id !== p.pg) && !p._abriu){ p._abriu = true; window.__tourNav = true; try { go(p.pg); } finally { window.__tourNav = false; } window.scrollTo({ top: 0 }); setTimeout(mostrar, 420); return; }
+    }
+    p._abriu = false;
+    marcaMenu(p.pg || null);
+    const els = elsDe(p); if (!els.length){ proximo(); return; }
     const r = caixa(els), alto = (r.bottom - r.top) > window.innerHeight * 0.55;
     const fixo = els.every(e => { for (let n = e; n && n !== document.body; n = n.parentElement){ if (getComputedStyle(n).position === "fixed") return true; } return false; });
     if (!fixo){
       if (alto) window.scrollTo({ top: Math.max(0, window.scrollY + r.top - 90), behavior: "smooth" });
       else window.scrollTo({ top: Math.max(0, window.scrollY + (r.top + r.bottom) / 2 - window.innerHeight * 0.4), behavior: "smooth" });
     } else els[0].scrollIntoView({ block: "nearest" });
-    bx.innerHTML = `<div class="tour-n">${i+1} de ${lista.length}</div><b>${p.t}</b><p>${p.x}</p><div class="tour-ac"><button type="button" class="tour-pular">${i === lista.length-1 ? "Fechar" : "Pular o tour"}</button><span class="tour-nav">${i > 0 ? '<button type="button" class="tour-ant" aria-label="Voltar">◀</button>' : ""}<button type="button" class="tour-prox">${i === lista.length-1 ? "Concluir ✓" : "Próximo ▶"}</button></span></div>`;
+    bx.innerHTML = `<div class="tour-n">${p.g ? p.g + " · " : ""}${i+1} de ${lista.length}</div><b>${p.t}</b><p>${p.x}</p><div class="tour-ac"><button type="button" class="tour-pular">${i === lista.length-1 ? "Fechar" : "Pular o tour"}</button><span class="tour-nav">${i > 0 ? '<button type="button" class="tour-ant" aria-label="Voltar">◀</button>' : ""}<button type="button" class="tour-prox">${i === lista.length-1 ? "Concluir ✓" : "Próximo ▶"}</button></span></div>`;
     bx.querySelector(".tour-pular").onclick = () => fim();
     bx.querySelector(".tour-prox").onclick = proximo;
     const ant = bx.querySelector(".tour-ant"); if (ant) ant.onclick = anterior;
@@ -7216,6 +7333,7 @@ const TOUR = (function(){
   function anterior(){ if (i > 0){ i--; mostrar(); } }
   function rodar(passos){
     lista = passos.filter(valePasso); if (!lista.length) return;
+    lista.forEach(p => { p._abriu = false; });
     montar(); i = -1; proximo();
     document.addEventListener("keydown", tecla, true);
   }
@@ -7223,6 +7341,36 @@ const TOUR = (function(){
     fim();
     if (typeof go === "function") go("busca");
     setTimeout(() => rodar(GERAL), 350);
+  }
+  /* Conhecer cada aba: todos os grupos, ou só um */
+  function abas(grupo){
+    fim();
+    const gs = grupo ? GRUPOS.filter(g => g.id === grupo) : GRUPOS;
+    const passos = [].concat(...gs.map(g => g.passos)).concat([celular() ? FIM_ABAS_CEL : FIM_ABAS]);
+    setTimeout(() => rodar(passos), 200);
+  }
+  /* Tela de escolha do tour */
+  function escolher(){
+    fim();
+    const fundo = document.createElement("div"); fundo.className = "tour-hl tour-fundo"; fundo.setAttribute("aria-hidden", "true");
+    const cx = document.createElement("div"); cx.className = "tour-bx tour-menu"; cx.setAttribute("role", "dialog"); cx.setAttribute("aria-label", "Escolha o tour");
+    cx.innerHTML = `<b>🧭 Tour do painel</b><p>Como você quer conhecer o painel?</p>
+      <div class="tour-ops">
+        <button type="button" data-o="abas"><span class="tour-oi">📚</span><span><b>Conhecer cada aba</b><small>Abre cada página e explica para que serve, o que precisa e o que entrega.</small></span></button>
+        <button type="button" data-o="rapido"><span class="tour-oi">⚡</span><span><b>Visão rápida</b><small>1 minuto: a busca, o menu e os botões do topo.</small></span></button>
+      </div>
+      <div class="tour-sub">Ou só um grupo do menu:</div>
+      <div class="tour-grp">${GRUPOS.map(g => `<button type="button" data-g="${g.id}">${g.ic} ${g.nome}</button>`).join("")}</div>
+      <div class="tour-ac"><button type="button" class="tour-pular">Fechar</button></div>`;
+    document.body.append(fundo, cx);
+    const fecha = () => { fundo.remove(); cx.remove(); document.removeEventListener("keydown", esc, true); };
+    const esc = e => { if (e.key === "Escape") fecha(); };
+    document.addEventListener("keydown", esc, true);
+    cx.querySelector(".tour-pular").onclick = fecha;
+    cx.querySelector('[data-o="abas"]').onclick = () => { fecha(); abas(); };
+    cx.querySelector('[data-o="rapido"]').onclick = () => { fecha(); iniciar(); };
+    cx.querySelectorAll("[data-g]").forEach(b => b.onclick = () => { fecha(); abas(b.dataset.g); });
+    cx.querySelector('[data-o="abas"]').focus();
   }
   function pagina(id){
     fim();
@@ -7235,12 +7383,13 @@ const TOUR = (function(){
   function fim(){
     if (bx || hl){ try{ localStorage.setItem(CHAVE, "1"); }catch(e){} }
     if (hl) hl.remove(); if (bx) bx.remove(); hl = bx = null; i = -1;
+    marcaMenu(null);
     window.removeEventListener("resize", posicionar); window.removeEventListener("scroll", posicionar, true);
     document.removeEventListener("keydown", tecla, true);
   }
   function talvez(){ let visto = "1"; try{ visto = localStorage.getItem(CHAVE); }catch(e){} if (!visto) setTimeout(iniciar, 300); }
   function ativo(){ return !!bx; }
-  return { iniciar, pagina, fim, talvez, ativo, PAGINAS };
+  return { iniciar, pagina, fim, talvez, ativo, PAGINAS, abas, escolher };
 })();
 (function(){
   /* botão "Tour desta página" no topo de cada página */
@@ -7253,7 +7402,7 @@ const TOUR = (function(){
   let splashVisivel = false;
   try{ const sp = document.getElementById("splash-screen"); splashVisivel = sp && sp.style.display !== "none" && !sp.classList.contains("hidden"); }catch(e){}
   if (!splashVisivel) setTimeout(() => TOUR.talvez(), 1200);
-  const sb = document.getElementById("sb-tour"); if (sb) sb.onclick = () => TOUR.iniciar();
+  const sb = document.getElementById("sb-tour"); if (sb) sb.onclick = () => TOUR.escolher();
   /* voltar ao topo */
   const topo = document.getElementById("topo-btn");
   const subir = () => { window.scrollTo({ top: 0, behavior: "smooth" }); const q = document.getElementById("gs-q"); };
