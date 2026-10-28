@@ -1,5 +1,1 @@
-{
-  "versao": 40,
-  "data": "28/10/2026",
-  "resumo": "Baixador Betim com as telas de cada passo e tour da página com as imagens; extensão 2.4.5."
-}
+{"versao":41,"data":"28/10/2026","resumo":"Baixador Betim 2.4.6: corrige o erro do Excel ao abrir planilhas direto do pacote .zip."}
