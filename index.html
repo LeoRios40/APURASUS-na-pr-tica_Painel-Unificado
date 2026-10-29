@@ -57,7 +57,7 @@ const REGRAS_APURASUS = {
     ["Gás Engarrafado GLP","DRIVE"],["Gases Medicinais","DRIVE"],
     ["Serviço de Água e Esgoto","DRIVE"],
     ["Serviço de Manutenção e Conservação de Máquinas e Equipamentos","DRIVE"],
-    ["Serviço de Lavanderia","DRIVE"],["Serviço de Coleta de Resíduos de Saúde","DRIVE"],
+    ["Serviço de Lavanderia","DRIVE"],["Serviço de Coleta de Resíduos de Saúde","DRIVE"],["Serviço de Dosimetria","DRIVE"],
     ["Serviços de Comunicação de Dados (internet e outros)","DRIVE"],
     ["Serviços de Controle de Vetores e Pragas Urbanas","DRIVE"],
     ["Serviços de Cópias e Reprodução de Documentos","DRIVE"],
@@ -1971,6 +1971,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">29/10/2026</span><div><b>Conferência Drive mais clara</b> — na aba “Somente Drive”, as linhas do Drive que sobravam agora dizem o motivo: <b>Material de Limpeza</b> e <b>Material Odontológico</b> (que somam Drive + SIGSS) aparecem num grupo próprio, explicando que são conferidos na Conferência SIGSS; e os itens que <b>não estão no relatório do APURASUS</b> da unidade (ex.: Guarda Patrimonial) dizem isso com todas as letras. O <b>Serviço de Dosimetria</b> passou a ser conferido com o Drive, como os outros itens do Drive.</div></div>
           <div class="nv-item"><span class="nv-data">29/10/2026</span><div><b>Planilhas com valores em Real</b> — todas as planilhas que o painel gera (Analisadores, Conferências e Conferir meu mês) saem com os valores no formato <b>R$</b>, as datas como <b>data</b> do Excel e ano, mês, matrícula e código como número simples (sem “2.026,00”). As quantidades (produção, itens) saem sem casas decimais quando são inteiras.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Pacote do Baixador direto no Conferir meu mês</b> — ao abrir o .zip ou a pasta do Baixador, o painel mostra o ano inteiro: os meses que vieram (✔), os que faltam (✖) e os que ainda não fecharam (⏳), para a Folha, o Estoque e a Produção. A Folha e o Estoque já entram sozinhos no <b>Conferir meu mês</b>, e um quadro no topo da página mostra o que já está e o que falta colocar: o relatório do APURASUS (obrigatório) e a planilha do Drive.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Baixador Betim 2.6.1</b> — com o login geral do RH, a Central volta a <b>seguir o SIGA</b>: sem nenhuma unidade marcada, ela usa a unidade escolhida no SIGA e baixa o Estoque e a Produção dessa mesma unidade. Marcar unidades na lista continua valendo para baixar várias de uma vez.</div></div>
@@ -6084,6 +6085,7 @@ async function processar(opts){
     let nFalta=0, nZeroAmbos=0, nItens=0, nDrive=0, semFonte=[];
     const itensDrive = [];        // para a aba "Somente Drive"
     const usadasDrive = new Set(); // linhas do Drive que casaram com algum item
+    const todosItens = [];         // todos os itens do relatório do APURASUS (para explicar as sobras do Drive)
 
     const cel = (v, fill, extra) => {
       const o = { v: (v===undefined||v===null) ? "" : v, t: typeof v==="number" ? "n" : "s" };
@@ -6110,9 +6112,11 @@ async function processar(opts){
     for (let i=iCab+1;i<apura.length;i++){
       const r = apura[i];
       const item = String(r[0]??"").trim(); if (!item) continue;
-      const fonte = mapaFontes[norm(item)] || "";
+      let fonte = mapaFontes[norm(item)] || "";
       const nItem = norm(item);
       const ehGrupo = !fonte && (/^TOTAL/.test(nItem) || GRUPOS.includes(nItem));
+      if (!fonte && !ehGrupo && acharNoDrive(item).length) fonte = "DRIVE";   // sem fonte cadastrada, mas está na planilha do Drive
+      if (!ehGrupo) todosItens.push({ item, n: nItem, fonte });
       const valores = []; for (let c=1;c<=nMes;c++) valores.push(toNumOrKeep(r[c]));
       const cores = new Array(nMes).fill(null);
       let status = "";
@@ -6198,17 +6202,31 @@ async function processar(opts){
     // linhas do Drive que não casaram com nenhum item do relatório
     const sobra = linhasDrive.filter(lr => !usadasDrive.has(lr)).map(lr => {
       const vals = mesesA.map(d => { if (!d) return ""; const cols = cab.mapa[`${d.m}-${d.y}`]; if (!cols) return ""; let vd=0; for (const col of cols){ const v=num(lr[col]); if (v>vd) vd=v; } return vd; });
-      return {nome:String(lr[0]).trim(), vals};
+      // o item do APURASUS com o mesmo nome (sem o que está entre parênteses no Drive)
+      const base = norm(String(lr[0]).replace(/\([^)]*\)/g, " "));
+      const par = todosItens.find(t => t.n === base) || todosItens.find(t => base.length >= 6 && t.n.length >= 6 && (base.includes(t.n) || t.n.includes(base)));
+      return {nome:String(lr[0]).trim(), vals, par};
     }).filter(x => x.vals.some(v => num(v) > 0));
     if (sobra.length){
-      const sep = [cel("ITENS DO DRIVE QUE NÃO APARECEM NO RELATÓRIO DO APURASUS (ou sem fonte DRIVE)","FF1D5C8F",{font:{bold:true,color:{rgb:"FFFFFFFF"}}})];
-      for (let c=0;c<3+nMes;c++) sep.push(cel("","FF1D5C8F"));
-      push(sep,"sep");
-      for (const x of sobra){
-        const l = [cel(x.nome), cel("DRIVE"), cel("Conferir: valor no Drive sem item correspondente",null,{font:{italic:true,color:{rgb:"FFB42318"}}}), cel("")];
-        x.vals.forEach(v => l.push(cel(v)));
-        push(l,"item");
-      }
+      const misto = sobra.filter(x => x.par && /SIGSS/i.test(x.par.fonte));
+      const fora = sobra.filter(x => !misto.includes(x));
+      const secao = (titulo, lista, txt, sty) => {
+        if (!lista.length) return;
+        const sep = [cel(titulo,"FF1D5C8F",{font:{bold:true,color:{rgb:"FFFFFFFF"}}})];
+        for (let c=0;c<3+nMes;c++) sep.push(cel("","FF1D5C8F"));
+        push(sep,"sep");
+        for (const x of lista){
+          const l = [cel(x.nome), cel("DRIVE"), cel(txt(x),null,sty), cel(x.par ? x.par.fonte : "")];
+          x.vals.forEach(v => l.push(cel(v)));
+          push(l,"item");
+        }
+      };
+      secao("PARTE DO DRIVE DE ITENS QUE SOMAM DRIVE + SIGSS (conferidos na aba Conferência SIGSS)", misto,
+        x => `No APURASUS, “${x.par.item}” soma Drive + SIGSS: este valor do Drive é conferido junto com o SIGSS (aba Conferência SIGSS / Conferir meu mês).`,
+        {font:{italic:true,color:{rgb:"FF1D5C8F"}}});
+      secao("ITENS DO DRIVE QUE NÃO ESTÃO NO RELATÓRIO DO APURASUS DESTA UNIDADE", fora,
+        x => x.par ? `Está no relatório como “${x.par.item}”, mas com outra fonte (${x.par.fonte || "sem fonte"}): confira o valor.` : "Tem valor no Drive, mas o item não está no relatório do APURASUS: confira se precisa ser lançado (ou cadastrado para a unidade).",
+        {font:{italic:true,color:{rgb:"FFB42318"}}});
     }
     const ws2 = XLSX.utils.aoa_to_sheet(sd);
     ws2["!cols"] = [{wch:50},{wch:11},{wch:55},{wch:34}].concat(new Array(nMes).fill({wch:13}));
@@ -7181,7 +7199,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 46, data: "29/10/2026" };
+const PAINEL_VERSAO = { n: 47, data: "29/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
