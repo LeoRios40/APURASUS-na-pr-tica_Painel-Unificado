@@ -1971,6 +1971,7 @@ if(!ok){document.write('<div class="nav-velho">\u26A0\uFE0F <b>Seu navegador est
         <h2>🆕 Novidades do painel</h2>
         <p class="sub">O que mudou nas ferramentas e nas regras, do mais recente para o mais antigo.</p>
         <div class="nv">
+          <div class="nv-item"><span class="nv-data">29/10/2026</span><div><b>Planilhas com valores em Real</b> — todas as planilhas que o painel gera (Analisadores, Conferências e Conferir meu mês) saem com os valores no formato <b>R$</b>, as datas como <b>data</b> do Excel e ano, mês, matrícula e código como número simples (sem “2.026,00”). As quantidades (produção, itens) saem sem casas decimais quando são inteiras.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Pacote do Baixador direto no Conferir meu mês</b> — ao abrir o .zip ou a pasta do Baixador, o painel mostra o ano inteiro: os meses que vieram (✔), os que faltam (✖) e os que ainda não fecharam (⏳), para a Folha, o Estoque e a Produção. A Folha e o Estoque já entram sozinhos no <b>Conferir meu mês</b>, e um quadro no topo da página mostra o que já está e o que falta colocar: o relatório do APURASUS (obrigatório) e a planilha do Drive.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Baixador Betim 2.6.1</b> — com o login geral do RH, a Central volta a <b>seguir o SIGA</b>: sem nenhuma unidade marcada, ela usa a unidade escolhida no SIGA e baixa o Estoque e a Produção dessa mesma unidade. Marcar unidades na lista continua valendo para baixar várias de uma vez.</div></div>
           <div class="nv-item"><span class="nv-data">28/10/2026</span><div><b>Baixador Betim 2.6.0: login geral do RH</b> — com o login geral do RH no SIGA, a Central baixa a Folha de <b>várias unidades num lote só</b> e separa cada uma pela lotação (pasta <code class="ol-code">Lote_…</code>). A Central também reconhece nomes abreviados (ex.: “ROGÉRIO G. REZENDE” = “ROGERIO GUSTAVO REZENDE”) e, se não achar a unidade do SIGA no SIGSS, pergunta qual é e guarda a escolha. Veja na aba Baixador Betim, passo 4, e baixe a versão 2.6.0.</div></div>
@@ -4030,6 +4031,140 @@ document.querySelectorAll("nav button, [data-go]").forEach(b => {
 });
 
 /* ======================================================
+   V46: formato das planilhas que o painel gera
+   valores em Real (R$), datas como data, ano/mês/matrícula/código como número simples
+   ====================================================== */
+const FMT_PLAN = (function(){
+  const MOEDA = '"R$"\\ #,##0.00', INT = "0", QTD = "#,##0", QTD2 = "#,##0.00", DATA = "dd/mm/yyyy";
+  const nz = s => String(s == null ? "" : s).normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[_\s]+/g, " ").trim();
+  const RE_DIN_FORTE = /VALOR|R\$|CUSTO|PRECO|GASTO|DESPESA|SALARIO|PROVISAO|ENCARGO|REMUNERA|BENEFICIO|HORA EXTRA|INCP|DIFERENCA|SALDO/;
+  const RE_ID = /(^|\W)(ANO|MES|MATRICULA|CODIGO|COD|CNES|CPF|CNS|CBO|ID|NO|NUMERO|NUM|LINHA|ORDEM|SEQ)(\W|$)/;
+  const RE_QTD = /QTD|QUANT|PROCEDIMENTO|ATENDIMENTO|CONSULTA|PRODUCAO|VISITA|EXAME|DOSE|VACINA|SERVIDORES|PROFISSIONA|PESSOAS|DIAS|CARGA|UNIDADE DE MEDIDA|ITENS|LINHAS|MESES|VEZES|EQUIPES|PACIENTES|USUARIOS/;
+  const RE_DIN = /TOTAL|APURASUS|SIGA|SIGSS|DRIVE|BASE|LANCAR|LANCADO|PREVISTO|(^|\W)(0[1-9]|1[0-2])\/(19|20)\d\d(\W|$)/;
+  // o que a coluna guarda, pelo cabeçalho: "din" (R$), "id" (número simples), "qtd" (quantidade) ou "" (não mexe)
+  function tipoDe(cab, opc){
+    const h = nz(cab);
+    if (!h) return "";
+    if ((/%|PERCENT|PROPOR|TAXA|INDICE/.test(h) || (/ALIQUOTA/.test(h) && !/(\+|COM) ?ALIQUOTA/.test(h))) && !RE_DIN_FORTE.test(h)) return "";
+    if (RE_DIN_FORTE.test(h) && !(opc && opc.semMoeda)) return "din";
+    if (RE_ID.test(h) && h.length <= 22) return "id";
+    if (RE_QTD.test(h)) return "qtd";
+    if (opc && opc.semMoeda) return "";
+    if (RE_DIN.test(h)) return "din";
+    return "";
+  }
+  const RE_DATA = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const RE_REAL = /^-?\s*(R\$\s*)?-?\d{1,3}(\.\d{3})*,\d{2}$/;
+  const RE_GRUPO = /(^|\W)(0[1-9]|1[0-2])\/(19|20)\d\d(\W|$)/;  // "01/2026": cabeçalho de grupo mesclado
+  const realNum = s => { const neg = /-/.test(s); const n = Number(String(s).replace(/[^\d,]/g, "").replace(",", ".")); return neg ? -n : n; };
+  const ehTxtCab = v => typeof v === "string" && v.trim() && v.length <= 70 && !RE_DATA.test(v.trim()) && !RE_REAL.test(v.trim());
+  const ehNumVal = v => typeof v === "number" || (v && typeof v === "object" && (v.formula || v.sharedFormula));
+  const dataDe = s => { const d = String(s).trim().match(RE_DATA); return d && +d[2] >= 1 && +d[2] <= 12 && +d[1] >= 1 && +d[1] <= 31 ? [+d[1], +d[2], +d[3]] : null; };
+
+  // cabeçalho de cada célula: a(s) linha(s) de cabeçalho mais recentes acima dela (vale também para tabelas no meio da aba)
+  function cabecalhos(val, nR, nC){
+    const cab = [], atual = {}; let prevCab = false;
+    const cand = [], temNum = [];
+    for (let r = 0; r < nR; r++){
+      let nTxt = 0; temNum[r] = new Set();
+      for (let c = 0; c < nC; c++){ const v = val(r, c); if (ehTxtCab(v)) nTxt++; else if (ehNumVal(v)) temNum[r].add(c); }
+      cand[r] = nTxt >= 2 && !temNum[r].size;
+    }
+    // é cabeçalho quando tem texto em cima de alguma coluna que traz número na primeira linha de dados abaixo
+    const ehCab = r => {
+      if (!cand[r]) return false;
+      let r2 = r + 1; while (r2 < nR && (cand[r2] || !temNum[r2].size) && r2 - r < 4) r2++;
+      if (r2 >= nR || !temNum[r2].size) return false;
+      let grupo = false;
+      for (let c = 0; c < nC; c++){ const v = val(r, c); if (ehTxtCab(v)) grupo = RE_GRUPO.test(v); else if (!(grupo && (v === "" || v == null))) { if (v !== "" && v != null) grupo = false; continue; } if (temNum[r2].has(c)) return true; }
+      return false;
+    };
+    for (let r = 0; r < nR; r++){
+      const linhaCab = ehCab(r);
+      cab[r] = {};
+      for (let c = 0; c < nC; c++) cab[r][c] = (atual[c] || []).join(" ");
+      if (linhaCab){
+        if (!prevCab) for (const k in atual) delete atual[k];
+        let grupo = "";
+        for (let c = 0; c < nC; c++){
+          const v = val(r, c);
+          if (ehTxtCab(v)){ (atual[c] = atual[c] || []).push(String(v)); grupo = RE_GRUPO.test(v) ? String(v) : ""; }
+          else if (grupo && (v === "" || v == null)) (atual[c] = atual[c] || []).push(grupo);
+        }
+      }
+      prevCab = linhaCab;
+    }
+    return cab;
+  }
+  const decidir = (tipo, v, zAtual) => {
+    if (zAtual && /%|yy|dd|\[|R\$|"/.test(zAtual)) return null;   // já tem formato próprio (%, data, R$, cores)
+    if (tipo === "din") return MOEDA;
+    if (tipo === "id") return Number.isInteger(v) ? INT : null;
+    if (tipo === "qtd") return Number.isInteger(v) ? QTD : QTD2;
+    if (Number.isInteger(v) && zAtual === "#,##0.00") return QTD;    // inteiro sem tipo conhecido: sem ",00"
+    return null;
+  };
+
+  /* ---------- SheetJS ---------- */
+  function sheetjs(wb, opc){
+    try{
+      (wb.SheetNames || []).forEach(nome => {
+        const ws = wb.Sheets[nome]; if (!ws || !ws["!ref"]) return;
+        const rg = XLSX.utils.decode_range(ws["!ref"]);
+        const cel = (r, c) => ws[XLSX.utils.encode_cell({ r: r + rg.s.r, c: c + rg.s.c })];
+        const nR = rg.e.r - rg.s.r + 1, nC = rg.e.c - rg.s.c + 1;
+        const cab = cabecalhos((r, c) => { const x = cel(r, c); return x ? x.v : null; }, nR, nC);
+        for (let r = 0; r < nR; r++) for (let c = 0; c < nC; c++){
+          const x = cel(r, c); if (!x) continue;
+          if (x.t === "s" && typeof x.v === "string"){
+            const d = dataDe(x.v);
+            if (d){ x.t = "n"; x.v = (Date.UTC(d[2], d[1] - 1, d[0]) - Date.UTC(1899, 11, 30)) / 86400000; x.z = DATA; delete x.w; continue; }
+            if (RE_REAL.test(x.v.trim()) && tipoDe(cab[r][c], opc) === "din"){ x.t = "n"; x.v = realNum(x.v); x.z = MOEDA; delete x.w; }
+            continue;
+          }
+          if (x.t !== "n" || typeof x.v !== "number") continue;
+          const z = decidir(tipoDe(cab[r][c], opc), x.v, x.z || "");
+          if (z){ x.z = z; delete x.w; }
+        }
+      });
+    }catch(e){ console.warn("FMT_PLAN sheetjs", e); }
+    return wb;
+  }
+
+  /* ---------- ExcelJS ---------- */
+  function exceljs(wb, opc){
+    try{
+      wb.eachSheet(ws => {
+        const nR = ws.rowCount, nC = ws.columnCount;
+        const val = (r, c) => { const v = ws.getRow(r + 1).getCell(c + 1).value; return v && v.richText ? v.richText.map(t => t.text).join("") : v; };
+        const cab = cabecalhos(val, nR, nC);
+        for (let r = 0; r < nR; r++){
+          const row = ws.getRow(r + 1);
+          for (let c = 0; c < nC; c++){
+            const cell = row.getCell(c + 1), v = cell.value;
+            if (v == null) continue;
+            if (typeof v === "string"){
+              const d = dataDe(v);
+              if (d){ cell.value = new Date(Date.UTC(d[2], d[1] - 1, d[0])); cell.numFmt = DATA; continue; }
+              if (RE_REAL.test(v.trim()) && tipoDe(cab[r][c], opc) === "din"){ cell.value = realNum(v); cell.numFmt = MOEDA; }
+              continue;
+            }
+            if (!ehNumVal(v)) continue;
+            const num = typeof v === "number" ? v : (typeof v.result === "number" ? v.result : 0.5);
+            const z = decidir(tipoDe(cab[r][c], opc), num, cell.numFmt && cell.numFmt !== "General" ? cell.numFmt : "");
+            if (z) cell.numFmt = z;
+          }
+        }
+      });
+    }catch(e){ console.warn("FMT_PLAN exceljs", e); }
+    return wb;
+  }
+  return { sheetjs, exceljs, tipoDe };
+})();
+function salvarXlsx(wb, nome, opc){ FMT_PLAN.sheetjs(wb, opc); return XLSX.writeFile(wb, nome); }
+async function bufExcel(wb, opc){ FMT_PLAN.exceljs(wb, opc); return wb.xlsx.writeBuffer(); }
+
+/* ======================================================
    ESTAÇÃO DE ANÁLISE - MÓDULO RH (SGI/SIGA)
    ====================================================== */
 const HR = (function(){
@@ -4610,7 +4745,7 @@ const HR = (function(){
         formatCells: false, formatColumns: false, formatRows: false
       });
 
-      const buffer = await newWb.xlsx.writeBuffer();
+      const buffer = await bufExcel(newWb);
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -4653,7 +4788,7 @@ const SIGSS = (function(){
     const ws = XLSX.utils.aoa_to_sheet(linhas); ws["!cols"] = [{wch:42},{wch:45},{wch:70}];
     XLSX.utils.book_append_sheet(wb, ws, (ultimoVinc.wb.SheetNames[0] || "Vínculos").slice(0,31));
     ultimoVinc.wb.SheetNames.slice(1).forEach(n => XLSX.utils.book_append_sheet(wb, ultimoVinc.wb.Sheets[n], n.slice(0,31)));
-    XLSX.writeFile(wb, `Planilha_Vinculos_${String(ultimoVinc.unidade || "unidade").replace(/[^\wÀ-ú]+/g,"_")}_com_nomes_novos.xlsx`);
+    salvarXlsx(wb, `Planilha_Vinculos_${String(ultimoVinc.unidade || "unidade").replace(/[^\wÀ-ú]+/g,"_")}_com_nomes_novos.xlsx`);
   }
 
   function removerAcentos(str){
@@ -5173,7 +5308,7 @@ const SIGSS = (function(){
     ws['!cols'] = [{ wch: 65 }, { wch: 25 }, { wch: 22 }, { wch: 90 }];
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "RELATÓRIO DIDÁTICO APURASUS");
-    XLSX.writeFile(wb, "Relatorio_Analise_SIGSS_Didatico.xlsx");
+    salvarXlsx(wb, "Relatorio_Analise_SIGSS_Didatico.xlsx", { semMoeda: true });
   }
 
   return { processData, limpar, downloadExcel, baixarVinculos };
@@ -5567,7 +5702,7 @@ const ESTOQUE = (function() {
 
     XLSX.utils.book_append_sheet(wb, ws2, "Resumo Diretrizes");
 
-    XLSX.writeFile(wb, `Painel_Estoque_APURASUS_${metadata.unidade.replace(/\s/g,'_')}.xlsx`);
+    salvarXlsx(wb, `Painel_Estoque_APURASUS_${metadata.unidade.replace(/\s/g,'_')}.xlsx`);
   }
 
   function exportarVariosMeses() {
@@ -5588,7 +5723,7 @@ const ESTOQUE = (function() {
     const ws0 = XLSX.utils.aoa_to_sheet(resumo); ws0['!cols'] = [{wch:12},{wch:16},{wch:20},{wch:16},{wch:16},{wch:16},{wch:70}]; formatar(ws0, [1,2,3,4,5]);
     XLSX.utils.book_append_sheet(wb, ws0, "Resumo por mês");
     abas.forEach(([n, ws]) => XLSX.utils.book_append_sheet(wb, ws, n.slice(0, 31)));
-    XLSX.writeFile(wb, `Painel_Estoque_APURASUS_${String(MESES_EST[0].meta.unidade).replace(/\s/g,'_')}_${MESES_EST.length}_meses.xlsx`);
+    salvarXlsx(wb, `Painel_Estoque_APURASUS_${String(MESES_EST[0].meta.unidade).replace(/\s/g,'_')}_${MESES_EST.length}_meses.xlsx`);
   }
 
   function fmt(v) { return v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
@@ -5809,7 +5944,7 @@ function limpar(){
   driveWb=null; driveCsvRows=null; mapaFontes=montarMapa(FONTES_PADRAO); ultimoArquivo=null;
   $("cf-sheet-box").classList.add("cf-hidden"); $("cf-results").style.display="none"; setStatus("");
 }
-function baixarDeNovo(){ if (ultimoArquivo) XLSX.writeFile(ultimoArquivo.wb, ultimoArquivo.nome); }
+function baixarDeNovo(){ if (ultimoArquivo) salvarXlsx(ultimoArquivo.wb, ultimoArquivo.nome); }
 
 function setStatus(msg, tipo){ const s=$("cf-status"); s.textContent=msg; s.className=tipo||""; }
 
@@ -6081,7 +6216,7 @@ async function processar(opts){
     const unidade = String(apura[0][0]||"").trim();
     const nome = "Relatorio_Processado" + (unidade ? "_"+unidade.replace(/[^\w\-]+/g,"_").replace(/_+/g,"_") : "") + ".xlsx";
     ultimoArquivo = {wb, nome};
-    if (!opts.lote) XLSX.writeFile(wb, nome);
+    if (!opts.lote) salvarXlsx(wb, nome);
     const itensOk = [];
     itensDrive.forEach(it=> it.valores.forEach((v,c)=>{ const d = mesesA[c]; if (d && num(v) > 0) itensOk.push({item: it.item, comp: String(d.m).padStart(2,"0")+"/"+d.y}); }));
     const mesesTxt = mesesA.filter(Boolean).map(d=>String(d.m).padStart(2,"0")+"/"+d.y);
@@ -6454,7 +6589,7 @@ const CRH = (function(){
   async function exportar(){
     if (!RES) return;
     const wb = new ExcelJS.Workbook(); montarAba(wb, RES);
-    const buf = await wb.xlsx.writeBuffer();
+    const buf = await bufExcel(wb);
     const url = URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
     const a = document.createElement("a"); a.href = url;
     a.download = `Conferencia_RH_${RES.unidade.replace(/[^\wÀ-ú]+/g,"_")}_${RES.periodo.replace(/[^\d]+/g,"-")}.xlsx`;
@@ -6746,7 +6881,7 @@ function montarAba(wb, RES){
 async function exportar(){
   if (!RES) return;
   const wb = new ExcelJS.Workbook(); montarAba(wb, RES);
-  const buf = await wb.xlsx.writeBuffer();
+  const buf = await bufExcel(wb);
   const url = URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
   const a = document.createElement("a"); a.href = url;
   a.download = `Conferencia_SIGSS_${RES.unidade.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^\w]+/g,"_").replace(/^_+|_+$/g,"")}_${RES.periodo.replace(/[^\d]+/g,"-")}.xlsx`;
@@ -6975,7 +7110,7 @@ const CMES = (function(){
     if (ult.drive){ abaDePrev(wb, "Drive - completo", ult.drive.prev); abaDePrev(wb, "Drive - somente Drive", ult.drive.prevD); }
     if (ult.rh) CRH.montarAba(wb, ult.rh.RES);
     if (ult.sigss) CSG.montarAba(wb, ult.sigss.RES);
-    const buf = await wb.xlsx.writeBuffer();
+    const buf = await bufExcel(wb);
     const url = URL.createObjectURL(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
     const a = document.createElement("a"); a.href = url;
     a.download = "Conferencia_do_mes_"+String(unidade).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^\w]+/g,"_").replace(/^_+|_+$/g,"")+"_"+periodo.replace(/[^\d]+/g,"-")+".xlsx";
@@ -7046,7 +7181,7 @@ async function importarProgresso(ev){
    internet, reportar um problema, checklist do mês para imprimir e
    frase de segurança dos dados
    ===================================================================== */
-const PAINEL_VERSAO = { n: 45, data: "28/10/2026" };
+const PAINEL_VERSAO = { n: 46, data: "29/10/2026" };
 const PAINEL_LINK = "https://leorios40.github.io/APURASUS-na-pr-tica_Painel-Unificado/";
 const DCFI_CONTATO = { email: "leonardo.rios@betim.mg.gov.br,daivison.osmar@betim.mg.gov.br", telefone: "(31) 3512-3336" };   // preencha o e-mail da DCFI para o botão já abrir com o destinatário
 const noLink = /^https?:$/.test(location.protocol) && location.href.indexOf(PAINEL_LINK.replace(/^https?:/, "")) >= 0;
